@@ -1,0 +1,446 @@
+{
+  "network": "Hyderabad Metro Rail",
+  "schemaVersion": 1,
+  "attribution": "© OpenStreetMap contributors (ODbL)",
+  "lines": [
+    {
+      "id": "red",
+      "name": "Red Line",
+      "color": "#E53935",
+      "stationIds": [
+        "miyapur",
+        "jntu-college",
+        "kphb-colony",
+        "kukatpally",
+        "balanagar",
+        "moosapet",
+        "bharat-nagar",
+        "erragadda",
+        "esi-hospital",
+        "sr-nagar",
+        "ameerpet",
+        "panjagutta",
+        "irrum-manzil",
+        "khairatabad",
+        "lakdikapul",
+        "assembly",
+        "nampally",
+        "gandhi-bhavan",
+        "osmania-medical-college",
+        "mg-bus-station",
+        "malakpet",
+        "new-market",
+        "musarambagh",
+        "dilsukhnagar",
+        "chaitanyapuri",
+        "victoria-memorial",
+        "lb-nagar"
+      ]
+    },
+    {
+      "id": "blue",
+      "name": "Blue Line",
+      "color": "#1E88E5",
+      "stationIds": [
+        "nagole",
+        "uppal",
+        "stadium",
+        "ngri",
+        "habsiguda",
+        "tarnaka",
+        "mettuguda",
+        "secunderabad-east",
+        "parade-ground",
+        "paradise",
+        "rasoolpura",
+        "prakash-nagar",
+        "begumpet",
+        "ameerpet",
+        "madhura-nagar",
+        "yusufguda",
+        "road-no-5-jubilee-hills",
+        "jubilee-hills-checkpost",
+        "peddamma-gudi",
+        "madhapur",
+        "durgam-cheruvu",
+        "hitec-city",
+        "raidurg"
+      ]
+    },
+    {
+      "id": "green",
+      "name": "Green Line",
+      "color": "#43A047",
+      "stationIds": [
+        "jbs-parade-ground",
+        "parade-ground",
+        "secunderabad-west",
+        "gandhi-hospital",
+        "musheerabad",
+        "rtc-cross-roads",
+        "chikkadpally",
+        "narayanaguda",
+        "sultan-bazar",
+        "mg-bus-station"
+      ]
+    }
+  ],
+  "stations": [
+    {
+      "id": "ameerpet",
+      "name": "Ameerpet",
+      "lat": 17.435418,
+      "lng": 78.444669
+    },
+    {
+      "id": "assembly",
+      "name": "Assembly",
+      "lat": 17.39813,
+      "lng": 78.470827
+    },
+    {
+      "id": "balanagar",
+      "name": "Balanagar",
+      "lat": 17.476895,
+      "lng": 78.42186
+    },
+    {
+      "id": "begumpet",
+      "name": "Begumpet",
+      "lat": 17.437573,
+      "lng": 78.456932
+    },
+    {
+      "id": "bharat-nagar",
+      "name": "Bharat Nagar",
+      "lat": 17.464239,
+      "lng": 78.429976
+    },
+    {
+      "id": "chaitanyapuri",
+      "name": "Chaitanyapuri",
+      "lat": 17.368285,
+      "lng": 78.535863
+    },
+    {
+      "id": "chikkadpally",
+      "name": "Chikkadpally",
+      "lat": 17.400363,
+      "lng": 78.494898
+    },
+    {
+      "id": "dilsukhnagar",
+      "name": "Dilsukhnagar",
+      "lat": 17.368543,
+      "lng": 78.525718
+    },
+    {
+      "id": "durgam-cheruvu",
+      "name": "Durgam Cheruvu",
+      "lat": 17.442909,
+      "lng": 78.387575
+    },
+    {
+      "id": "erragadda",
+      "name": "Erragadda",
+      "lat": 17.457396,
+      "lng": 78.43343
+    },
+    {
+      "id": "esi-hospital",
+      "name": "ESI Hospital",
+      "lat": 17.447372,
+      "lng": 78.43835
+    },
+    {
+      "id": "gandhi-bhavan",
+      "name": "Gandhi Bhavan",
+      "lat": 17.386095,
+      "lng": 78.473105
+    },
+    {
+      "id": "gandhi-hospital",
+      "name": "Gandhi Hospital",
+      "lat": 17.42552,
+      "lng": 78.5019
+    },
+    {
+      "id": "habsiguda",
+      "name": "Habsiguda",
+      "lat": 17.420179,
+      "lng": 78.54055
+    },
+    {
+      "id": "hitec-city",
+      "name": "HITEC City",
+      "lat": 17.449002,
+      "lng": 78.383137
+    },
+    {
+      "id": "irrum-manzil",
+      "name": "Irrum Manzil",
+      "lat": 17.420597,
+      "lng": 78.456075
+    },
+    {
+      "id": "jbs-parade-ground",
+      "name": "JBS Parade Ground",
+      "lat": 17.448818,
+      "lng": 78.496482
+    },
+    {
+      "id": "jntu-college",
+      "name": "JNTU College",
+      "lat": 17.498655,
+      "lng": 78.388866
+    },
+    {
+      "id": "jubilee-hills-checkpost",
+      "name": "Jubilee Hills Checkpost",
+      "lat": 17.428222,
+      "lng": 78.413694
+    },
+    {
+      "id": "khairatabad",
+      "name": "Khairatabad",
+      "lat": 17.411564,
+      "lng": 78.460846
+    },
+    {
+      "id": "kphb-colony",
+      "name": "KPHB Colony",
+      "lat": 17.493802,
+      "lng": 78.401764
+    },
+    {
+      "id": "kukatpally",
+      "name": "Kukatpally",
+      "lat": 17.485227,
+      "lng": 78.411541
+    },
+    {
+      "id": "lakdikapul",
+      "name": "Lakdikapul",
+      "lat": 17.403934,
+      "lng": 78.465005
+    },
+    {
+      "id": "lb-nagar",
+      "name": "LB Nagar",
+      "lat": 17.349827,
+      "lng": 78.547914
+    },
+    {
+      "id": "madhapur",
+      "name": "Madhapur",
+      "lat": 17.43726,
+      "lng": 78.400426
+    },
+    {
+      "id": "madhura-nagar",
+      "name": "Madhura Nagar",
+      "lat": 17.436965,
+      "lng": 78.439099
+    },
+    {
+      "id": "malakpet",
+      "name": "Malakpet",
+      "lat": 17.377188,
+      "lng": 78.493903
+    },
+    {
+      "id": "mettuguda",
+      "name": "Mettuguda",
+      "lat": 17.435524,
+      "lng": 78.519577
+    },
+    {
+      "id": "mg-bus-station",
+      "name": "MG Bus Station",
+      "lat": 17.3797,
+      "lng": 78.486018
+    },
+    {
+      "id": "miyapur",
+      "name": "Miyapur",
+      "lat": 17.496538,
+      "lng": 78.373025
+    },
+    {
+      "id": "moosapet",
+      "name": "Moosapet",
+      "lat": 17.472135,
+      "lng": 78.425924
+    },
+    {
+      "id": "musarambagh",
+      "name": "Musarambagh",
+      "lat": 17.371071,
+      "lng": 78.511946
+    },
+    {
+      "id": "musheerabad",
+      "name": "Musheerabad",
+      "lat": 17.417876,
+      "lng": 78.499502
+    },
+    {
+      "id": "nagole",
+      "name": "Nagole",
+      "lat": 17.390772,
+      "lng": 78.558821
+    },
+    {
+      "id": "nampally",
+      "name": "Nampally",
+      "lat": 17.392479,
+      "lng": 78.470161
+    },
+    {
+      "id": "narayanaguda",
+      "name": "Narayanaguda",
+      "lat": 17.394366,
+      "lng": 78.489957
+    },
+    {
+      "id": "new-market",
+      "name": "New Market",
+      "lat": 17.373427,
+      "lng": 78.503178
+    },
+    {
+      "id": "ngri",
+      "name": "NGRI",
+      "lat": 17.414825,
+      "lng": 78.546334
+    },
+    {
+      "id": "osmania-medical-college",
+      "name": "Osmania Medical College",
+      "lat": 17.382308,
+      "lng": 78.481165
+    },
+    {
+      "id": "panjagutta",
+      "name": "Panjagutta",
+      "lat": 17.428673,
+      "lng": 78.451104
+    },
+    {
+      "id": "parade-ground",
+      "name": "Parade Ground",
+      "lat": 17.44384,
+      "lng": 78.497527
+    },
+    {
+      "id": "paradise",
+      "name": "Paradise",
+      "lat": 17.443465,
+      "lng": 78.486245
+    },
+    {
+      "id": "peddamma-gudi",
+      "name": "Peddamma Gudi",
+      "lat": 17.430652,
+      "lng": 78.408374
+    },
+    {
+      "id": "prakash-nagar",
+      "name": "Prakash Nagar",
+      "lat": 17.444886,
+      "lng": 78.465876
+    },
+    {
+      "id": "raidurg",
+      "name": "Raidurg",
+      "lat": 17.442182,
+      "lng": 78.377184
+    },
+    {
+      "id": "rasoolpura",
+      "name": "Rasoolpura",
+      "lat": 17.443615,
+      "lng": 78.476408
+    },
+    {
+      "id": "road-no-5-jubilee-hills",
+      "name": "Road No. 5 Jubilee Hills",
+      "lat": 17.430049,
+      "lng": 78.423207
+    },
+    {
+      "id": "rtc-cross-roads",
+      "name": "RTC Cross Roads",
+      "lat": 17.407032,
+      "lng": 78.496802
+    },
+    {
+      "id": "secunderabad-east",
+      "name": "Secunderabad East",
+      "lat": 17.435718,
+      "lng": 78.505461
+    },
+    {
+      "id": "secunderabad-west",
+      "name": "Secunderabad West",
+      "lat": 17.433807,
+      "lng": 78.499518
+    },
+    {
+      "id": "sr-nagar",
+      "name": "SR Nagar",
+      "lat": 17.441706,
+      "lng": 78.441606
+    },
+    {
+      "id": "stadium",
+      "name": "Stadium",
+      "lat": 17.407397,
+      "lng": 78.55425
+    },
+    {
+      "id": "sultan-bazar",
+      "name": "Sultan Bazar",
+      "lat": 17.384445,
+      "lng": 78.484026
+    },
+    {
+      "id": "tarnaka",
+      "name": "Tarnaka",
+      "lat": 17.428296,
+      "lng": 78.528442
+    },
+    {
+      "id": "uppal",
+      "name": "Uppal",
+      "lat": 17.400061,
+      "lng": 78.560228
+    },
+    {
+      "id": "victoria-memorial",
+      "name": "Victoria Memorial",
+      "lat": 17.361849,
+      "lng": 78.543929
+    },
+    {
+      "id": "yusufguda",
+      "name": "Yusufguda",
+      "lat": 17.435112,
+      "lng": 78.427319
+    }
+  ],
+  "transfers": [
+    {
+      "stationId": "ameerpet",
+      "seconds": 300
+    },
+    {
+      "stationId": "mg-bus-station",
+      "seconds": 300
+    },
+    {
+      "stationId": "parade-ground",
+      "seconds": 300
+    }
+  ]
+}

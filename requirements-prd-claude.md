@@ -1,4 +1,4 @@
-# Metro Station Tracker — Product Requirements (v0.3)
+# Metro Station Tracker — Product Requirements (v0.4)
 
 > Source of truth: `requirements-prd-human.txt` (owner-edited). This file expands it into buildable requirements.
 > Items marked **[Assumption]** are Claude's guesses and need confirmation. Decisions are logged in `docs/decisions.md`.
@@ -33,9 +33,9 @@ Hyderabad Metro Rail has three operational lines:
 Interchange stations:
 - **Ameerpet** (Red ↔ Blue)
 - **MG Bus Station** (Red ↔ Green)
-- **Parade Ground / JBS Parade Ground** (Blue ↔ Green)
+- **Parade Ground** (Blue ↔ Green). Note: *JBS Parade Ground* is a different station, the Green Line terminus one stop north.
 
-The full station list (names, order, coordinates) must be built and checked before coding starts. See §8.
+In total there are **57 stations** (27 Red + 23 Blue + 10 Green, minus 3 shared interchanges). The data is in `app/src/main/assets/hyderabad_metro.json`, generated from OpenStreetMap by `tools/build_station_data.py`.
 
 **Helpful fact:** the network is almost entirely **elevated**, so GPS should be far more reliable than on an underground metro.
 
@@ -101,16 +101,19 @@ The full station list (names, order, coordinates) must be built and checked befo
 
 - **Language/UI:** Kotlin + Jetpack Compose
 - **Background work:** foreground service (`location` type) + FusedLocationProviderClient
-- **Notifications:** NotificationCompat ongoing notification (low importance, silent), plus a separate channel for the single-buzz alerts
-- **Data:** `hyderabad_metro.json` in `assets/`, loaded into memory
+- **Notifications:** NotificationCompat ongoing notification (low importance, silent), plus a separate channel for the heads-up and arrival buzzes
+- **Data:** `hyderabad_metro.json` in `assets/`, loaded into memory. It is generated, not hand-edited: fix the data in OSM or in the script's `NAME_FIXES`, then re-run the script.
 - **Architecture:** route, ETA and station-detection logic in plain Kotlin with no Android dependencies, so it is unit-testable and can be shared with iOS later (Kotlin Multiplatform)
 
 ### Data model (sketch)
 ```
+// Stored in hyderabad_metro.json
 Line      { id, name, color, stationIds[] (ordered) }
-Station   { id, name, lat, lng, lineIds[] }
-Segment   { fromStationId, toStationId, lineId, travelSeconds }
-Transfer  { stationId(s), fromLineId, toLineId, transferSeconds }
+Station   { id, name, lat, lng }                  // which lines a station is on is derived from Line.stationIds
+Transfer  { stationId, seconds }                  // interchange walk + wait, default 300 s
+
+// Computed in code
+segmentSeconds(a, b) = dwell (~30 s) + distance(a, b) / average speed (~35 km/h), calibrated from real rides
 RouteLeg  { lineId, stationIds[] }            // one leg per line ridden
 Trip      { startId, endId, legs[], currentLegIndex, currentStationIndex, startedAt, eta }
 ```
@@ -118,8 +121,9 @@ Trip      { startId, endId, legs[], currentLegIndex, currentStationIndex, starte
 ## 8. Pre-build tasks and milestones
 
 **Pre-build**
-- Build `hyderabad_metro.json`: every station in order on each line, with coordinates. Possible sources are OpenStreetMap and the official HMRL route map; verify them against each other.
-- Estimate the segment travel times (e.g. ~2 min between stations, refined later from real rides).
+- ✅ `hyderabad_metro.json` generated from OpenStreetMap (57 stations, both directions of each line cross-checked).
+- ⏳ Owner to sanity-check station names and order against the metro map/signage.
+- Segment travel times are computed from distance (see §7) and calibrated on the first real rides.
 
 **Milestones**
 | Milestone | Scope | Done when |
@@ -139,7 +143,8 @@ Trip      { startId, endId, legs[], currentLegIndex, currentStationIndex, starte
 - **Station detection accuracy** on a real train is unproven. Validate it first on a real ride (see Q5).
 - **OEM battery killers** (Xiaomi, Realme, Oppo, Vivo, …) can stop the foreground service mid-trip. The owner's test phone (Nothing Phone 2, near-stock Android) is lenient, so it **will hide this problem**. Test on at least one aggressive-OEM phone before M3, and guide users to exempt the app from battery optimisation.
 - **Location permission:** start the tracking service while the app is on screen, so only "while using the app" location permission is needed. This avoids `ACCESS_BACKGROUND_LOCATION`, which Google Play reviews strictly.
-- **Network facts** in §3 are from memory and must be verified against the official HMRL map.
+- **Station data** comes from OpenStreetMap, which is community-maintained and may lag behind renames or new stations. Re-run the generator before release.
+- **Licence:** OSM data is ODbL. The app must show "© OpenStreetMap contributors" (e.g. on an About screen) before public release.
 
 ## 11. Open items
 Tracked in `qa-claude-asks.md`. Resolved answers get folded into the sections above and logged in `docs/decisions.md`.
