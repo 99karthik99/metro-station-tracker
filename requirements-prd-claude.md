@@ -48,7 +48,9 @@ In total there are **57 stations** (27 Red + 23 Blue + 10 Green, minus 3 shared 
 5. An **ongoing notification** updates as the train passes stations:
    - Title: `Next: ESI Hospital`
    - Text: `15 stops left · change at Ameerpet in 3`
-   - Header shows the ETA, plus a progress bar and an **End trip** action.
+   - Header: `Uppal in 39 min · 09:53`. **Minutes to destination** come first, with the arrival clock time after. The header is visible even when the notification is collapsed.
+   - A progress bar and an **End trip** action.
+   - Minutes are recalculated on every station change and at least once a minute. Under 1 min it shows `Uppal in <1 min`; after arrival the header shows `arrived`.
 6. Two light alerts (vibration + default sound) before each interchange and before the destination:
    - **Heads-up** one stop before. At an interchange it names the **direction**, matching platform signage: "Next: Ameerpet, change here · Take Blue Line towards Nagole".
    - **Arrival**: "Get off now: Uppal".
@@ -72,7 +74,7 @@ In total there are **57 stations** (27 Red + 23 Blue + 10 Green, minus 3 shared 
 | F3 | Compute the route between any two stations, including interchanges (fewest stations, with a penalty per line change) | Must |
 | F4 | Track the user's location in the background during an active trip | Must |
 | F5 | Work out the current or last-passed station from location (nearest station along the planned route) | Must |
-| F6 | Ongoing notification: next station, stations left, ETA, and the upcoming interchange if any | Must |
+| F6 | Ongoing notification: next station, stations left, **minutes to destination + arrival time**, and the upcoming interchange if any | Must |
 | F7 | Update the notification on each station change; ETA can refresh about every 30–60 s | Must |
 | F8 | Two buzzes per stop that matters (destination and each interchange): heads-up one station before, and on arrival | Must |
 | F9 | Stop tracking automatically on arrival, or manually from the app or the notification's **End trip** action | Must |

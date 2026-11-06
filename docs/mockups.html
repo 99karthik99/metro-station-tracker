@@ -44,7 +44,7 @@ p{margin:0}
 <body>
 <main>
 <h1>Metro Tracker: mockups v1</h1>
-<p class="sub">Agreed on 2026-11-07. Example trip: Miyapur → Uppal, changing at Ameerpet. Decisions are in docs/decisions.md (D15–D17); requirements are in PRD §4 and §4a.</p>
+<p class="sub">Agreed on 2026-11-07; minutes-to-destination added 2026-11-07. Example trip: Miyapur → Uppal, changing at Ameerpet. Decisions are in docs/decisions.md (D15–D17); requirements are in PRD §4 and §4a.</p>
 
 <h2>Trip flow</h2>
 <p class="sub">Plan screen, trip screen, notification states.</p>
@@ -76,7 +76,7 @@ p{margin:0}
 <div>
 <div class="ph">
 <div class="sb"><span>09:14</span><span><i class="ti ti-map-pin"></i> <i class="ti ti-battery-3"></i></span></div>
-<div style="display:flex;justify-content:space-between;align-items:center;margin:4px 6px"><span style="font-size:18px;font-weight:600">To Uppal</span><span class="sec">ETA 09:53</span></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin:4px 6px"><span style="font-size:18px;font-weight:600">To Uppal</span><span class="sec"><b style="color:var(--t1)">39 min</b> · 09:53</span></div>
 <p class="sec" style="margin:0 6px 12px">15 stops left · change in 3</p>
 <div style="padding:0 6px">
 <div class="row muted"><div class="rail"><span class="ln" style="background:var(--red-faded)"></span></div><span><i class="ti ti-chevron-down"></i> 7 stations passed</span></div>
@@ -98,11 +98,11 @@ p{margin:0}
 <div>
 <div class="ph" style="background:var(--s1);gap:10px">
 <div class="sb"><span>09:14</span><span><i class="ti ti-battery-3"></i></span></div>
-<div class="ntf" style="background:var(--s2)"><div class="nh"><i class="ti ti-train"></i>Metro Tracker · ETA 09:53</div><p style="font-weight:600">Next: ESI Hospital</p><p class="sec">15 stops left · change at Ameerpet in 3</p><div style="display:flex;height:4px;border-radius:2px;overflow:hidden;margin:8px 0 6px;background:var(--b)"><span style="width:32%;background:var(--red)"></span></div><p class="act" style="margin:0">End trip</p></div>
+<div class="ntf" style="background:var(--s2)"><div class="nh"><i class="ti ti-train"></i>Metro Tracker · <b style="color:var(--t1)">Uppal in 39 min</b> · 09:53</div><p style="font-weight:600">Next: ESI Hospital</p><p class="sec">15 stops left · change at Ameerpet in 3</p><div style="display:flex;height:4px;border-radius:2px;overflow:hidden;margin:8px 0 6px;background:var(--b)"><span style="width:32%;background:var(--red)"></span></div><p class="act" style="margin:0">End trip</p></div>
 <p class="cap" style="margin:-4px 0 6px">a · Riding (silent, ongoing)</p>
-<div class="ntf" style="background:var(--s2);border-color:var(--warn-b)"><div class="nh"><i class="ti ti-vibration"></i>Metro Tracker · buzz</div><p style="font-weight:600">Next: Ameerpet, change here</p><p class="sec">Take Blue Line towards Nagole</p><p class="act">End trip</p></div>
+<div class="ntf" style="background:var(--s2);border-color:var(--warn-b)"><div class="nh"><i class="ti ti-vibration"></i>Metro Tracker · <b style="color:var(--t1)">Uppal in 29 min</b> · 09:53</div><p style="font-weight:600">Next: Ameerpet, change here</p><p class="sec">Take Blue Line towards Nagole</p><p class="act">End trip</p></div>
 <p class="cap" style="margin:-4px 0 6px">b · Heads-up, one stop before</p>
-<div class="ntf" style="background:var(--s2);border-color:var(--danger-b)"><div class="nh"><i class="ti ti-vibration"></i>Metro Tracker · buzz</div><p style="font-weight:600">Get off now: Uppal</p><p class="sec">You've arrived. Trip ends in 2 min.</p><p class="act">End trip</p></div>
+<div class="ntf" style="background:var(--s2);border-color:var(--danger-b)"><div class="nh"><i class="ti ti-vibration"></i>Metro Tracker · arrived</div><p style="font-weight:600">Get off now: Uppal</p><p class="sec">You've arrived. Trip ends in 2 min.</p><p class="act">End trip</p></div>
 <p class="cap" style="margin:-4px 0 0">c · Arrival</p>
 </div>
 <p class="cap">3 · Notification states (lock screen)</p>
