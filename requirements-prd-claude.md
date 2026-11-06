@@ -48,9 +48,10 @@ In total there are **57 stations** (27 Red + 23 Blue + 10 Green, minus 3 shared 
 5. An **ongoing notification** updates as the train passes stations:
    - Title: `Next: ESI Hospital`
    - Text: `15 stops left · change at Ameerpet in 3`
-   - Header: `Uppal in 39 min · 09:53`. **Minutes to destination** come first, with the arrival clock time after. The header is visible even when the notification is collapsed.
+   - Header: `Arrive in 39 min · 09:53`. **Minutes to destination** come first, with the arrival clock time after. The header is visible even when the notification is collapsed. The destination name is left out: the rider knows it, and long names (e.g. "Road No. 5 Jubilee Hills") would push the minutes off the line.
    - A progress bar and an **End trip** action.
-   - Minutes are recalculated on every station change and at least once a minute. Under 1 min it shows `Uppal in <1 min`; after arrival the header shows `arrived`.
+   - **Most important words first in every line** ("Next: …", "Get off now: …"), so that if Android truncates a long station name, only the end of the line is lost.
+   - Minutes are recalculated on every station change and at least once a minute. Under 1 min it shows `Arrive in <1 min`; after arrival the header shows `arrived`.
 6. Two light alerts (vibration + default sound) before each interchange and before the destination:
    - **Heads-up** one stop before. At an interchange it names the **direction**, matching platform signage: "Next: Ameerpet, change here · Take Blue Line towards Nagole".
    - **Arrival**: "Get off now: Uppal".
