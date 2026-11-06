@@ -35,7 +35,7 @@ Interchange stations:
 - **MG Bus Station** (Red ↔ Green)
 - **Parade Ground** (Blue ↔ Green). Note: *JBS Parade Ground* is a different station, the Green Line terminus one stop north.
 
-In total there are **57 stations** (27 Red + 23 Blue + 10 Green, minus 3 shared interchanges). The data is in `app/src/main/assets/hyderabad_metro.json`, generated from OpenStreetMap by `tools/build_station_data.py`.
+In total there are **57 stations** (27 Red + 23 Blue + 10 Green, minus 3 shared interchanges). The data is in `core/src/main/resources/hyderabad_metro.json`, generated from OpenStreetMap by `tools/build_station_data.py`.
 
 **Helpful fact:** the network is almost entirely **elevated**, so GPS should be far more reliable than on an underground metro.
 
@@ -113,8 +113,10 @@ In total there are **57 stations** (27 Red + 23 Blue + 10 Green, minus 3 shared 
 - **Language/UI:** Kotlin + Jetpack Compose
 - **Background work:** foreground service (`location` type) + FusedLocationProviderClient
 - **Notifications:** NotificationCompat ongoing notification (low importance, silent), plus a separate channel for the heads-up and arrival buzzes
-- **Data:** `hyderabad_metro.json` in `assets/`, loaded into memory. It is generated, not hand-edited: fix the data in OSM or in the script's `NAME_FIXES`, then re-run the script.
-- **Architecture:** route, ETA and station-detection logic in plain Kotlin with no Android dependencies, so it is unit-testable and can be shared with iOS later (Kotlin Multiplatform)
+- **Data:** `hyderabad_metro.json` is a Java resource in the `:core` module, loaded into memory by `NetworkLoader`. It is generated, not hand-edited: fix the data in OSM or in the script's `NAME_FIXES`, then re-run the script.
+- **Architecture:** two Gradle modules:
+  - `:core`: plain Kotlin/JVM, so **Android imports are impossible**. Holds network data, routing (`RoutePlanner`, Dijkstra over station+line states), ETA and later station detection. Unit tests run on the JVM in seconds. It can become a Kotlin Multiplatform module for iOS later.
+  - `:app`: Android UI (Compose), the tracking service and notifications. Depends on `:core`.
 
 ### Data model (sketch)
 ```
@@ -124,7 +126,7 @@ Station   { id, name, lat, lng }                  // which lines a station is on
 Transfer  { stationId, seconds }                  // interchange walk + wait, default 300 s
 
 // Computed in code
-segmentSeconds(a, b) = dwell (~30 s) + distance(a, b) / average speed (~35 km/h), calibrated from real rides
+segmentSeconds(a, b) = dwell (25 s) + distance(a, b) / cruise speed (45 km/h)   // TravelTimeModel; calibrate from real rides
 RouteLeg  { lineId, stationIds[] }            // one leg per line ridden
 Trip      { startId, endId, legs[], currentLegIndex, currentStationIndex, startedAt, eta }
 ```
