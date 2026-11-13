@@ -2,8 +2,8 @@ package com.karthikmacherla.metrotracker.plan
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.karthikmacherla.metrotracker.MetroData
 import com.karthikmacherla.metrotracker.core.MetroNetwork
-import com.karthikmacherla.metrotracker.core.NetworkLoader
 import com.karthikmacherla.metrotracker.core.Route
 import com.karthikmacherla.metrotracker.core.RoutePlanner
 import com.karthikmacherla.metrotracker.core.Station
@@ -40,8 +40,8 @@ class PlanViewModel : ViewModel() {
     init {
         viewModelScope.launch {
             // Parsing JSON is work, so it runs off the main (UI) thread.
-            val network = withContext(Dispatchers.Default) { NetworkLoader.loadHyderabad() }
-            planner = RoutePlanner(network)
+            val network = withContext(Dispatchers.Default) { MetroData.network }
+            planner = MetroData.planner
             _state.update { it.copy(network = network) }
         }
     }

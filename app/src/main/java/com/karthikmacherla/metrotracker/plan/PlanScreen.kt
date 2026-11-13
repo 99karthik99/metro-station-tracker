@@ -19,11 +19,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 import com.karthikmacherla.metrotracker.R
 import com.karthikmacherla.metrotracker.core.Line
 import com.karthikmacherla.metrotracker.core.MetroNetwork
@@ -48,6 +52,7 @@ import com.karthikmacherla.metrotracker.core.NetworkLoader
 import com.karthikmacherla.metrotracker.core.Route
 import com.karthikmacherla.metrotracker.core.RoutePlanner
 import com.karthikmacherla.metrotracker.core.Station
+import com.karthikmacherla.metrotracker.tracking.ActiveTrip
 import com.karthikmacherla.metrotracker.ui.theme.MetroTrackerTheme
 
 private enum class PickTarget { From, To }
@@ -64,6 +69,9 @@ fun PlanScreen(
     onSwap: () -> Unit,
     onStartTrip: () -> Unit,
     modifier: Modifier = Modifier,
+    activeTrip: ActiveTrip? = null,
+    notificationsOff: Boolean = false,
+    onEndTrip: () -> Unit = {},
 ) {
     val network = state.network
     if (network == null) {
@@ -96,6 +104,11 @@ fun PlanScreen(
         Text(stringResource(R.string.plan_title), style = MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(20.dp))
 
+        activeTrip?.let {
+            ActiveTripBanner(it, network, notificationsOff, onEndTrip)
+            Spacer(Modifier.height(20.dp))
+        }
+
         StationField(stringResource(R.string.plan_from), state.from, network) { picking = PickTarget.From }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             IconButton(onClick = onSwap, enabled = state.from != null || state.to != null) {
@@ -117,10 +130,32 @@ fun PlanScreen(
             HorizontalDivider()
             Spacer(Modifier.height(16.dp))
             RoutePreview(route, network)
-            Spacer(Modifier.height(24.dp))
-            Button(onClick = onStartTrip, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.plan_start_trip))
+            // One trip at a time: while one runs, the banner above offers End trip instead.
+            if (activeTrip == null) {
+                Spacer(Modifier.height(24.dp))
+                Button(onClick = onStartTrip, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.plan_start_trip))
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun ActiveTripBanner(trip: ActiveTrip, network: MetroNetwork, notificationsOff: Boolean, onEndTrip: () -> Unit) {
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+        Column(Modifier.padding(16.dp).fillMaxWidth()) {
+            Text(stringResource(R.string.trip_in_progress), style = MaterialTheme.typography.titleMedium)
+            Text(
+                network.station(trip.route.fromStationId).name + " → " + network.station(trip.route.toStationId).name,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            if (notificationsOff) {
+                Spacer(Modifier.height(6.dp))
+                Text(stringResource(R.string.trip_notifications_off), style = MaterialTheme.typography.bodySmall)
+            }
+            Spacer(Modifier.height(12.dp))
+            OutlinedButton(onClick = onEndTrip) { Text(stringResource(R.string.trip_end)) }
         }
     }
 }
@@ -212,7 +247,7 @@ private fun LegRow(dotColor: Color?, title: String, subtitle: String?, trailing:
 private fun minutesCeil(seconds: Int): Int = (seconds + 59) / 60
 
 /** Line colours come from the station data as "#RRGGBB". */
-fun lineColor(line: Line): Color = Color(android.graphics.Color.parseColor(line.color))
+fun lineColor(line: Line): Color = Color(line.color.toColorInt())
 
 @Preview(showBackground = true, heightDp = 720)
 @Composable
