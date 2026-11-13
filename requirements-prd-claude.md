@@ -81,7 +81,7 @@ In total there are **57 stations** (27 Red + 23 Blue + 10 Green, minus 3 shared 
 | F9 | Stop tracking automatically on arrival, or manually from the app or the notification's **End trip** action | Must |
 | F10 | Trip screen: the route as a vertical station list with the current position highlighted. Tapping a station corrects the current position if detection is wrong | Must |
 | F11 | Recent trips on the plan screen (one tap to repeat) | Must |
-| F14 | Default the start station to the nearest station | Should |
+| F14 | Default the start station to the nearest station, **only once location permission has already been granted** (we never ask for location just to open the app) | Should |
 | F15 | Auto-end the trip 2 minutes after arrival | Must |
 | F12 | Map screen | Later |
 | F13 | Notification has one action (**End trip**); tapping the notification opens the trip screen | Must |
@@ -148,6 +148,14 @@ Trip      { startId, endId, legs[], currentLegIndex, currentStationIndex, starte
 | **M2** | Live tracking **across interchanges**, off-route detection | Real interchange rides (e.g. via Ameerpet) track correctly |
 | **M3** | Public release: Play Store listing, privacy policy, testing on other phone brands | ~2 weeks of reliable daily use on the owner's commute |
 
+### M1 progress
+- ✅ Station data, routing (`:core`), CI
+- ✅ Plan screen (pickers, swap, route preview)
+- ✅ Permission flow, foreground tracking service, ongoing notification (time-based estimate), trip trace recording
+- ⏳ Station detection + heads-up/arrival alerts + auto-end (step 4)
+- ⏳ Trip screen, recent trips, nearest-station default (step 5)
+- ⏳ Real single-line ride
+
 ## 9. Out of scope for v1
 - Live train timings or crowd data
 - Ticketing or fares
@@ -156,6 +164,7 @@ Trip      { startId, endId, legs[], currentLegIndex, currentStationIndex, starte
 - Map screen
 
 ## 10. Key risks
+- **Trip lost if Android kills the app process** (rare for a foreground service, but possible on low memory). The service doesn't restart (`START_NOT_STICKY`), so the user must start the trip again. Persisting the active trip is a later improvement.
 - **Station detection accuracy** on a real train is unproven. Validate it first on a real ride (see Q5).
 - **OEM battery killers** (Xiaomi, Realme, Oppo, Vivo, …) can stop the foreground service mid-trip. The owner's test phone (Nothing Phone 2, near-stock Android) is lenient, so it **will hide this problem**. Test on at least one aggressive-OEM phone before M3, and guide users to exempt the app from battery optimisation.
 - **Location permission:** start the tracking service while the app is on screen, so only "while using the app" location permission is needed. This avoids `ACCESS_BACKGROUND_LOCATION`, which Google Play reviews strictly.
