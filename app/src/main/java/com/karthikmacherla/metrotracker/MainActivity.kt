@@ -1,16 +1,19 @@
 package com.karthikmacherla.metrotracker
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.karthikmacherla.metrotracker.plan.PlanScreen
+import com.karthikmacherla.metrotracker.plan.PlanViewModel
 import com.karthikmacherla.metrotracker.ui.theme.MetroTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,28 +23,21 @@ class MainActivity : ComponentActivity() {
         setContent {
             MetroTrackerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Karthik",
-                        modifier = Modifier.padding(innerPadding)
+                    // viewModel() returns the same PlanViewModel after rotation instead of a new one.
+                    val planViewModel: PlanViewModel = viewModel()
+                    val state by planViewModel.state.collectAsState()
+                    PlanScreen(
+                        state = state,
+                        onSelectFrom = planViewModel::selectFrom,
+                        onSelectTo = planViewModel::selectTo,
+                        onSwap = planViewModel::swap,
+                        onStartTrip = {
+                            Toast.makeText(this, R.string.plan_tracking_not_ready, Toast.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.padding(innerPadding),
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MetroTrackerTheme {
-        Greeting("Android")
     }
 }
