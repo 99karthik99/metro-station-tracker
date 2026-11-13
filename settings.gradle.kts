@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Metro Tracker"
 include(":app")
+include(":core")

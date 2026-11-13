@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build app/src/main/assets/hyderabad_metro.json from OpenStreetMap.
+"""Build core/src/main/resources/hyderabad_metro.json from OpenStreetMap.
 
 Usage:
     python3 tools/build_station_data.py            # fetch from Overpass, then build
@@ -20,7 +20,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "app/src/main/assets/hyderabad_metro.json"
+OUT = ROOT / "core/src/main/resources/hyderabad_metro.json"
 
 OVERPASS_HOSTS = [
     "https://overpass.kumi.systems/api/interpreter",

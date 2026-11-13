@@ -1,4 +1,4 @@
-# Metro Station Tracker — Product Requirements (v0.4)
+# Metro Station Tracker — Product Requirements (v0.5)
 
 > Source of truth: `requirements-prd-human.txt` (owner-edited). This file expands it into buildable requirements.
 > Items marked **[Assumption]** are Claude's guesses and need confirmation. Decisions are logged in `docs/decisions.md`.
@@ -35,24 +35,36 @@ Interchange stations:
 - **MG Bus Station** (Red ↔ Green)
 - **Parade Ground** (Blue ↔ Green). Note: *JBS Parade Ground* is a different station, the Green Line terminus one stop north.
 
-In total there are **57 stations** (27 Red + 23 Blue + 10 Green, minus 3 shared interchanges). The data is in `app/src/main/assets/hyderabad_metro.json`, generated from OpenStreetMap by `tools/build_station_data.py`.
+In total there are **57 stations** (27 Red + 23 Blue + 10 Green, minus 3 shared interchanges). The data is in `core/src/main/resources/hyderabad_metro.json`, generated from OpenStreetMap by `tools/build_station_data.py`.
 
 **Helpful fact:** the network is almost entirely **elevated**, so GPS should be far more reliable than on an underground metro.
 
 ## 4. Core user flow
 
-1. The user opens the app and grants location and notification permissions (asked when the first trip starts, not at install).
-2. The user picks a **start station** and an **end station** (searchable list across all lines).
-3. The app shows the route preview: stations in order, line colours, any interchange ("Change at Ameerpet → Blue Line"), the total station count and the estimated travel time.
-4. The user taps **Start trip**.
-5. The app shows an **ongoing notification** that updates as the train passes stations:
-   `Next: Begumpet · 4 stations left · ETA 10:42`
-   Before an interchange, it says so:
-   `Next: Ameerpet — change to Blue Line · 6 stations left · ETA 10:55`
-6. Two light alerts before the destination and before each interchange (vibration plus the default notification sound):
-   - **Heads-up buzz** one station before: "Next: Ameerpet — get ready to change"
-   - **Arrival buzz** when the train reaches the stop: "Get off now"
-7. When the destination is reached (or the user taps **End trip**), tracking stops and the notification is cleared.
+1. **Plan screen** (home): the user picks a **start station** (defaults to the station nearest them) and an **end station** (searchable across all lines), or taps a **recent trip**.
+2. The route preview appears on the same screen: total time, stop count, number of changes, a colour bar per line, and one row per leg ("Red Line to Ameerpet · 10 stops", "Change at Ameerpet ~5 min", "Blue Line to Uppal · 12 stops").
+3. The user taps **Start trip**. The first time, a **permission explanation screen** comes before the Android permission prompts (see §4a).
+4. **Trip screen**: a line diagram with passed and far-away stations collapsed. It highlights the next station, shows interchanges with a "change to <line>" tag, and has the destination at the bottom. Tapping a station corrects the current position.
+5. An **ongoing notification** updates as the train passes stations:
+   - Title: `Next: ESI Hospital`
+   - Text: `15 stops left · change at Ameerpet in 3`
+   - Header: `Arrive in 39 min · 09:53`. **Minutes to destination** come first, with the arrival clock time after. The header is visible even when the notification is collapsed. The destination name is left out: the rider knows it, and long names (e.g. "Road No. 5 Jubilee Hills") would push the minutes off the line.
+   - A progress bar and an **End trip** action.
+   - **Most important words first in every line** ("Next: …", "Get off now: …"), so that if Android truncates a long station name, only the end of the line is lost.
+   - Minutes are recalculated on every station change and at least once a minute. Under 1 min it shows `Arrive in <1 min`; after arrival the header shows `arrived`.
+6. Two light alerts (vibration + default sound) before each interchange and before the destination:
+   - **Heads-up** one stop before. At an interchange it names the **direction**, matching platform signage: "Next: Ameerpet, change here · Take Blue Line towards Nagole".
+   - **Arrival**: "Get off now: Uppal".
+7. The trip **ends automatically 2 minutes after arrival** (or when the user taps **End trip**). Tracking stops and the notification is cleared.
+8. Tracking never starts automatically; the user always taps Start trip.
+
+### 4a. Permissions
+- Ask only when the user first taps Start trip, never at install.
+- Show our own explanation screen first (why location, why notifications, and that location stays on the phone). Then show the Android prompts.
+- Needed: **precise location, "While using the app"**, and **notifications** (Android 13+). Background location is never requested.
+- If the user picks **Approximate** location (Android 12+), that is accurate only to about 1–3 km, so it can't tell stations apart (they are ~0.6–1.7 km apart). Show a recovery screen explaining this, with a button to the app's settings.
+- If notifications are denied, explain that alerts won't show. Tracking still works on the trip screen.
+- If a permission is denied permanently, Android won't prompt again, so the recovery screen links to the app's settings page.
 
 ## 5. Functional requirements
 
@@ -63,12 +75,14 @@ In total there are **57 stations** (27 Red + 23 Blue + 10 Green, minus 3 shared 
 | F3 | Compute the route between any two stations, including interchanges (fewest stations, with a penalty per line change) | Must |
 | F4 | Track the user's location in the background during an active trip | Must |
 | F5 | Work out the current or last-passed station from location (nearest station along the planned route) | Must |
-| F6 | Ongoing notification: next station, stations left, ETA, and the upcoming interchange if any | Must |
+| F6 | Ongoing notification: next station, stations left, **minutes to destination + arrival time**, and the upcoming interchange if any | Must |
 | F7 | Update the notification on each station change; ETA can refresh about every 30–60 s | Must |
 | F8 | Two buzzes per stop that matters (destination and each interchange): heads-up one station before, and on arrival | Must |
 | F9 | Stop tracking automatically on arrival, or manually from the app or the notification's **End trip** action | Must |
 | F10 | Trip screen: the route as a vertical station list with the current position highlighted. Tapping a station corrects the current position if detection is wrong | Must |
-| F11 | Remember recent or favourite trips | Later |
+| F11 | Recent trips on the plan screen (one tap to repeat) | Must |
+| F14 | Default the start station to the nearest station | Should |
+| F15 | Auto-end the trip 2 minutes after arrival | Must |
 | F12 | Map screen | Later |
 | F13 | Notification has one action (**End trip**); tapping the notification opens the trip screen | Must |
 
@@ -102,8 +116,10 @@ In total there are **57 stations** (27 Red + 23 Blue + 10 Green, minus 3 shared 
 - **Language/UI:** Kotlin + Jetpack Compose
 - **Background work:** foreground service (`location` type) + FusedLocationProviderClient
 - **Notifications:** NotificationCompat ongoing notification (low importance, silent), plus a separate channel for the heads-up and arrival buzzes
-- **Data:** `hyderabad_metro.json` in `assets/`, loaded into memory. It is generated, not hand-edited: fix the data in OSM or in the script's `NAME_FIXES`, then re-run the script.
-- **Architecture:** route, ETA and station-detection logic in plain Kotlin with no Android dependencies, so it is unit-testable and can be shared with iOS later (Kotlin Multiplatform)
+- **Data:** `hyderabad_metro.json` is a Java resource in the `:core` module, loaded into memory by `NetworkLoader`. It is generated, not hand-edited: fix the data in OSM or in the script's `NAME_FIXES`, then re-run the script.
+- **Architecture:** two Gradle modules:
+  - `:core`: plain Kotlin/JVM, so **Android imports are impossible**. Holds network data, routing (`RoutePlanner`, Dijkstra over station+line states), ETA and later station detection. Unit tests run on the JVM in seconds. It can become a Kotlin Multiplatform module for iOS later.
+  - `:app`: Android UI (Compose), the tracking service and notifications. Depends on `:core`.
 
 ### Data model (sketch)
 ```
@@ -113,7 +129,7 @@ Station   { id, name, lat, lng }                  // which lines a station is on
 Transfer  { stationId, seconds }                  // interchange walk + wait, default 300 s
 
 // Computed in code
-segmentSeconds(a, b) = dwell (~30 s) + distance(a, b) / average speed (~35 km/h), calibrated from real rides
+segmentSeconds(a, b) = dwell (25 s) + distance(a, b) / cruise speed (45 km/h)   // TravelTimeModel; calibrate from real rides
 RouteLeg  { lineId, stationIds[] }            // one leg per line ridden
 Trip      { startId, endId, legs[], currentLegIndex, currentStationIndex, startedAt, eta }
 ```

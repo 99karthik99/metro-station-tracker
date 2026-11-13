@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metro Tracker Mockups</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{--page:#f5f4ef;--s1:#faf9f5;--s2:#ffffff;--t1:#1f1e1d;--t2:#5f5e5a;--t3:#888780;--b:rgba(31,30,29,.15);--b2:rgba(31,30,29,.3);
+--acc:#185FA5;--acc-bg:#E6F1FB;--on-acc:#fff;--warn:#BA7517;--warn-b:#EF9F27;--danger:#A32D2D;--danger-b:#F09595;--ok:#3B6D11;--ok-bg:#EAF3DE;
+--red:#E24B4A;--red-faded:#F7C1C1;--blue:#378ADD;--chip-bg:#E6F1FB;--chip-t:#0C447C}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--page:#1a1a19;--s1:#232322;--s2:#2b2b2a;--t1:#f1efe8;--t2:#b4b2a9;--t3:#888780;--b:rgba(241,239,232,.15);--b2:rgba(241,239,232,.3);
+--acc:#85B7EB;--acc-bg:#0C447C;--on-acc:#042C53;--warn:#EF9F27;--warn-b:#854F0B;--danger:#F09595;--danger-b:#A32D2D;--ok:#97C459;--ok-bg:#27500A;--red-faded:#791F1F;--chip-bg:#0C447C;--chip-t:#E6F1FB}}
+:root[data-theme="dark"]{--page:#1a1a19;--s1:#232322;--s2:#2b2b2a;--t1:#f1efe8;--t2:#b4b2a9;--t3:#888780;--b:rgba(241,239,232,.15);--b2:rgba(241,239,232,.3);
+--acc:#85B7EB;--acc-bg:#0C447C;--on-acc:#042C53;--warn:#EF9F27;--warn-b:#854F0B;--danger:#F09595;--danger-b:#A32D2D;--ok:#97C459;--ok-bg:#27500A;--red-faded:#791F1F;--chip-bg:#0C447C;--chip-t:#E6F1FB}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--t1);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:24px 16px}
+main{max-width:1040px;margin:0 auto}
+h1{font-size:22px;font-weight:600;margin:0 0 4px}
+h2{font-size:17px;font-weight:600;margin:32px 0 4px}
+.sub{color:var(--t2);margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.ph{background:var(--s2);border:1px solid var(--b2);border-radius:28px;padding:14px 14px 18px;max-width:310px;margin:0 auto;font-size:13px;min-height:540px;display:flex;flex-direction:column}
+.sb{display:flex;justify-content:space-between;font-size:11px;color:var(--t2);padding:0 6px 10px}
+.cap{font-size:12px;color:var(--t2);text-align:center;margin:10px 0 0}
+.lbl{font-size:11px;color:var(--t3);margin:0 0 4px}
+.fld{border:1px solid var(--b2);border-radius:8px;padding:9px 10px;display:flex;align-items:center;gap:8px;background:var(--s1)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.row{display:flex;align-items:center;gap:10px;min-height:26px}
+.rail{width:14px;display:flex;justify-content:center;align-self:stretch;position:relative}
+.rail .ln{width:4px;position:absolute;top:0;bottom:0}
+.muted{color:var(--t3)} .sec{color:var(--t2)}
+button{font:inherit;border-radius:8px;cursor:pointer;width:100%;padding:10px;background:transparent;color:var(--t1);border:1px solid var(--b2)}
+.pri{background:var(--acc);color:var(--on-acc);border:none;font-weight:600}
+.ghost{border:none;color:var(--t2);margin-top:8px}
+.ntf{background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:10px 12px}
+.nh{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--t2);margin-bottom:4px}
+.act{margin:8px 0 0;font-size:12px;color:var(--acc);font-weight:600}
+.it{display:flex;gap:10px;margin:0 4px 14px}
+.ic{width:32px;height:32px;border-radius:50%;background:var(--acc-bg);color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none;font-size:17px}
+p{margin:0}
+</style>
+</head>
+<body>
+<main>
+<h1>Metro Tracker: mockups v1</h1>
+<p class="sub">Agreed on 2026-11-07; minutes-to-destination added 2026-11-07. Example trip: Miyapur → Uppal, changing at Ameerpet. Decisions are in docs/decisions.md (D15–D17); requirements are in PRD §4 and §4a.</p>
+
+<h2>Trip flow</h2>
+<p class="sub">Plan screen, trip screen, notification states.</p>
+<div class="grid">
+
+<div>
+<div class="ph">
+<div class="sb"><span>08:58</span><span><i class="ti ti-wifi"></i> <i class="ti ti-battery-3"></i></span></div>
+<p style="font-size:18px;font-weight:600;margin:4px 6px 14px">Plan your trip</p>
+<p class="lbl">From</p>
+<div class="fld"><span class="dot" style="background:var(--red)"></span><span style="flex:1">Miyapur</span><i class="ti ti-current-location" style="color:var(--acc)"></i></div>
+<div style="display:flex;justify-content:flex-end;margin:4px 0"><span style="border:1px solid var(--b);border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center"><i class="ti ti-arrows-up-down"></i></span></div>
+<p class="lbl">To</p>
+<div class="fld"><span class="dot" style="background:var(--blue)"></span><span style="flex:1">Uppal</span><i class="ti ti-x muted"></i></div>
+<div style="border-top:1px solid var(--b);margin:14px 0 10px"></div>
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><span style="font-size:20px;font-weight:600">53 min</span><span class="sec">22 stops · 1 change</span></div>
+<div style="display:flex;height:6px;border-radius:3px;overflow:hidden;margin-bottom:10px"><span style="flex:10;background:var(--red)"></span><span style="width:4px"></span><span style="flex:12;background:var(--blue)"></span></div>
+<div class="row"><i class="ti ti-train" style="color:var(--red)"></i><span style="flex:1">Red Line to Ameerpet</span><span class="sec">10 stops</span></div>
+<div class="row sec"><i class="ti ti-walk"></i><span style="flex:1">Change at Ameerpet</span><span>~5 min</span></div>
+<div class="row"><i class="ti ti-train" style="color:var(--blue)"></i><span style="flex:1">Blue Line to Uppal</span><span class="sec">12 stops</span></div>
+<div style="flex:1"></div>
+<p class="lbl" style="margin-top:14px">Recent</p>
+<div class="row sec"><i class="ti ti-history"></i><span>Uppal → Miyapur</span></div>
+<button class="pri" style="margin-top:12px">Start trip</button>
+</div>
+<p class="cap">1 · Plan: pick stations (or a recent trip), see the route, start</p>
+</div>
+
+<div>
+<div class="ph">
+<div class="sb"><span>09:14</span><span><i class="ti ti-map-pin"></i> <i class="ti ti-battery-3"></i></span></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin:4px 6px"><span style="font-size:18px;font-weight:600">To Uppal</span><span class="sec"><b style="color:var(--t1)">39 min</b> · 09:53</span></div>
+<p class="sec" style="margin:0 6px 12px">15 stops left · change in 3</p>
+<div style="padding:0 6px">
+<div class="row muted"><div class="rail"><span class="ln" style="background:var(--red-faded)"></span></div><span><i class="ti ti-chevron-down"></i> 7 stations passed</span></div>
+<div class="row muted"><div class="rail"><span class="ln" style="background:var(--red-faded)"></span><span class="dot" style="position:relative;margin-top:8px;background:var(--s2);border:2px solid var(--red-faded)"></span></div><span>Erragadda</span></div>
+<div class="row" style="background:var(--acc-bg);border-radius:8px;margin:2px -6px;padding:0 6px"><div class="rail"><span class="ln" style="background:var(--red)"></span><span style="position:relative;margin-top:5px;width:16px;height:16px;border-radius:50%;background:var(--red);border:3px solid var(--s2)"></span></div><span style="flex:1;font-weight:600;color:var(--acc)">ESI Hospital</span><span style="font-size:11px;color:var(--acc)">next</span></div>
+<div class="row"><div class="rail"><span class="ln" style="background:var(--red)"></span><span class="dot" style="position:relative;margin-top:8px;background:var(--s2);border:2px solid var(--red)"></span></div><span>SR Nagar</span></div>
+<div class="row"><div class="rail"><span class="ln" style="background:var(--red);bottom:50%"></span><span class="ln" style="background:var(--blue);top:50%"></span><span class="dot" style="position:relative;margin-top:7px;width:12px;height:12px;background:var(--s2);border:2px solid var(--t1)"></span></div><span style="flex:1;font-weight:600">Ameerpet</span><span style="font-size:11px;background:var(--chip-bg);color:var(--chip-t);border-radius:6px;padding:1px 6px">change to Blue</span></div>
+<div class="row"><div class="rail"><span class="ln" style="background:var(--blue)"></span><span class="dot" style="position:relative;margin-top:8px;background:var(--s2);border:2px solid var(--blue)"></span></div><span>Begumpet</span></div>
+<div class="row muted"><div class="rail"><span class="ln" style="background:var(--blue)"></span></div><span><i class="ti ti-dots"></i> 10 more stations</span></div>
+<div class="row"><div class="rail"><span class="ln" style="background:var(--blue);bottom:50%"></span><span class="dot" style="position:relative;margin-top:7px;width:12px;height:12px;background:var(--blue)"></span></div><span style="flex:1;font-weight:600">Uppal</span><i class="ti ti-flag"></i></div>
+</div>
+<div style="flex:1"></div>
+<p class="muted" style="font-size:11px;margin:10px 6px 0">Wrong station? Tap where you are.</p>
+<button style="margin-top:10px;color:var(--danger);border-color:var(--danger-b)">End trip</button>
+</div>
+<p class="cap">2 · Trip: live line diagram</p>
+</div>
+
+<div>
+<div class="ph" style="background:var(--s1);gap:10px">
+<div class="sb"><span>09:14</span><span><i class="ti ti-battery-3"></i></span></div>
+<div class="ntf" style="background:var(--s2)"><div class="nh"><i class="ti ti-train"></i>Metro Tracker · <b style="color:var(--t1)">Arrive in 39 min</b> · 09:53</div><p style="font-weight:600">Next: ESI Hospital</p><p class="sec">15 stops left · change at Ameerpet in 3</p><div style="display:flex;height:4px;border-radius:2px;overflow:hidden;margin:8px 0 6px;background:var(--b)"><span style="width:32%;background:var(--red)"></span></div><p class="act" style="margin:0">End trip</p></div>
+<p class="cap" style="margin:-4px 0 6px">a · Riding (silent, ongoing)</p>
+<div class="ntf" style="background:var(--s2);border-color:var(--warn-b)"><div class="nh"><i class="ti ti-vibration"></i>Metro Tracker · <b style="color:var(--t1)">Arrive in 29 min</b> · 09:53</div><p style="font-weight:600">Next: Ameerpet, change here</p><p class="sec">Take Blue Line towards Nagole</p><p class="act">End trip</p></div>
+<p class="cap" style="margin:-4px 0 6px">b · Heads-up, one stop before</p>
+<div class="ntf" style="background:var(--s2);border-color:var(--danger-b)"><div class="nh"><i class="ti ti-vibration"></i>Metro Tracker · arrived</div><p style="font-weight:600">Get off now: Uppal</p><p class="sec">You've arrived. Trip ends in 2 min.</p><p class="act">End trip</p></div>
+<p class="cap" style="margin:-4px 0 0">c · Arrival</p>
+</div>
+<p class="cap">3 · Notification states (lock screen)</p>
+</div>
+
+</div>
+
+<h2>Permission flow</h2>
+<p class="sub">Shown only the first time the user taps Start trip. Background location is never requested.</p>
+<div class="grid">
+
+<div>
+<div class="ph">
+<div class="sb"><span>08:59</span><span><i class="ti ti-battery-3"></i></span></div>
+<p style="font-size:18px;font-weight:600;margin:8px 4px 6px">Two quick permissions</p>
+<p class="sec" style="margin:0 4px 18px">So we can tell you when to get off.</p>
+<div class="it"><span class="ic"><i class="ti ti-map-pin"></i></span><div><p style="font-weight:600">Precise location</p><p class="sec">To know which station you're at. Stations are less than 1 km apart, so approximate location isn't enough.</p></div></div>
+<div class="it"><span class="ic"><i class="ti ti-bell"></i></span><div><p style="font-weight:600">Notifications</p><p class="sec">To show your next stop and buzz before you need to get off.</p></div></div>
+<div class="it"><span class="ic" style="background:var(--ok-bg);color:var(--ok)"><i class="ti ti-shield-lock"></i></span><div><p style="font-weight:600">Only during a trip</p><p class="sec">Location is used only while a trip is running and never leaves your phone.</p></div></div>
+<div style="flex:1"></div>
+<button class="pri">Continue</button>
+<button class="ghost">Not now</button>
+</div>
+<p class="cap">1 · Our explanation, before Android asks</p>
+</div>
+
+<div>
+<div class="ph" style="background:var(--s1)">
+<div class="sb"><span>08:59</span><span><i class="ti ti-battery-3"></i></span></div>
+<div style="flex:1"></div>
+<div style="background:var(--s2);border-radius:22px;padding:18px 16px">
+<div style="text-align:center;color:var(--acc);font-size:20px"><i class="ti ti-map-pin"></i></div>
+<p style="text-align:center;margin:6px 0 14px;font-weight:600">Allow Metro Tracker to access this device's location?</p>
+<div style="display:flex;gap:10px;justify-content:center;margin-bottom:14px">
+<div style="text-align:center;border:2px solid var(--acc);border-radius:12px;padding:8px 10px;width:96px"><i class="ti ti-target" style="font-size:22px;color:var(--acc)"></i><p style="font-size:12px;font-weight:600">Precise</p></div>
+<div class="sec" style="text-align:center;border:1px solid var(--b);border-radius:12px;padding:8px 10px;width:96px"><i class="ti ti-circle-dashed" style="font-size:22px"></i><p style="font-size:12px">Approximate</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;text-align:center">
+<div style="background:var(--acc-bg);color:var(--acc);border-radius:16px;padding:8px;font-weight:600">While using the app</div>
+<div style="background:var(--s1);border-radius:16px;padding:8px">Only this time</div>
+<div style="background:var(--s1);border-radius:16px;padding:8px">Don't allow</div>
+</div>
+</div>
+<div style="flex:1"></div>
+</div>
+<p class="cap">2 · Android's own prompt (not ours to style)</p>
+</div>
+
+<div>
+<div class="ph">
+<div class="sb"><span>09:00</span><span><i class="ti ti-battery-3"></i></span></div>
+<div style="flex:1"></div>
+<div style="text-align:center;font-size:28px;color:var(--warn)"><i class="ti ti-map-pin-off"></i></div>
+<p style="font-size:17px;font-weight:600;text-align:center;margin:8px 4px 6px">Precise location is off</p>
+<p class="sec" style="text-align:center;margin:0 8px 14px">Approximate location can be off by 1–3 km. Metro stations are closer together than that, so we can't tell which one you're at.</p>
+<div class="sec" style="background:var(--s1);border-radius:8px;padding:10px 12px;margin:0 4px 16px;font-size:12px">In settings: Permissions → Location → turn on <b style="color:var(--t1)">Use precise location</b></div>
+<div style="flex:1"></div>
+<button class="pri">Open settings</button>
+<button class="ghost">Back to plan</button>
+</div>
+<p class="cap">3 · Recovery if approximate or denied</p>
+</div>
+
+</div>
+</main>
+</body>
+</html>
