@@ -1,3 +1,33 @@
 <resources>
     <string name="app_name">Metro Tracker</string>
+
+    <!-- Plan screen -->
+    <string name="plan_title">Plan your trip</string>
+    <string name="plan_from">From</string>
+    <string name="plan_to">To</string>
+    <string name="plan_choose_station">Choose a station</string>
+    <string name="plan_swap">Swap start and destination</string>
+    <string name="plan_same_station">Start and destination are the same station</string>
+    <string name="plan_start_trip">Start trip</string>
+    <string name="plan_tracking_not_ready">Trip tracking is coming in the next step</string>
+    <string name="plan_minutes">%d min</string>
+    <string name="plan_no_changes">no changes</string>
+    <string name="plan_leg_title">%1$s to %2$s</string>
+    <string name="plan_towards">towards %s</string>
+    <string name="plan_change_at">Change at %s</string>
+    <string name="plan_change_minutes">~%d min</string>
+
+    <plurals name="plan_stops">
+        <item quantity="one">%d stop</item>
+        <item quantity="other">%d stops</item>
+    </plurals>
+    <plurals name="plan_changes">
+        <item quantity="one">%d change</item>
+        <item quantity="other">%d changes</item>
+    </plurals>
+
+    <!-- Station picker -->
+    <string name="picker_search">Search stations</string>
+    <string name="picker_cancel">Cancel</string>
+    <string name="picker_no_results">No station matches \"%s\"</string>
 </resources>
