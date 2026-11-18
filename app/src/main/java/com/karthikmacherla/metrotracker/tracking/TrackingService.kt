@@ -22,6 +22,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.karthikmacherla.metrotracker.MetroData
+import com.karthikmacherla.metrotracker.core.GetOffAlert
 import com.karthikmacherla.metrotracker.core.GetOffAlerts
 import com.karthikmacherla.metrotracker.core.LocationFix
 import kotlinx.coroutines.CoroutineScope
@@ -141,7 +142,7 @@ class TrackingService : Service() {
         scope.launch {
             TripRepository.activeTrip.collect { current ->
                 refreshNotification()
-                current?.let { alerts?.check(it.progress)?.let { index -> postGetOffAlert(it, index) } }
+                current?.let { alerts?.check(it.progress)?.let { alert -> postGetOffAlert(it, alert) } }
             }
         }
         scope.launch {
@@ -199,10 +200,10 @@ class TrackingService : Service() {
     }
 
     @SuppressLint("MissingPermission") // checked by canNotify()
-    private fun postGetOffAlert(trip: ActiveTrip, stationIndex: Int) {
+    private fun postGetOffAlert(trip: ActiveTrip, alert: GetOffAlert) {
         if (!canNotify()) return
         NotificationManagerCompat.from(this)
-            .notify(TripNotifications.GET_OFF_ALERT_ID, TripNotifications.buildGetOffAlert(this, trip, stationIndex))
+            .notify(TripNotifications.GET_OFF_ALERT_ID, TripNotifications.buildGetOffAlert(this, trip, alert))
     }
 
     private fun canNotify(): Boolean =
