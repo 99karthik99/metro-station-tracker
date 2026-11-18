@@ -1,10 +1,12 @@
-# Runs the unit tests and builds the debug app on every pull request and on pushes to main.
+# Runs the unit tests and builds the debug app on every pull request and on pushes to main
+# and claude/** branches. Pushes also publish the APK to the "dev" GitHub release, so the
+# latest build can be installed on a phone without Android Studio.
 name: CI
 
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, "claude/**"]
 
 # A newer push to the same branch cancels the run that is still going.
 concurrency:
@@ -13,6 +15,8 @@ concurrency:
 
 jobs:
   build:
+    permissions:
+      contents: write # to publish the dev release
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -38,3 +42,16 @@ jobs:
           path: |
             core/build/reports/tests/
             app/build/reports/tests/
+
+      # The release always holds the latest pushed build, whichever branch it came from.
+      - name: Publish APK to the dev release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          apk="metro-tracker-${GITHUB_RUN_NUMBER}.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk "$apk"
+          gh release delete dev --cleanup-tag --yes || true
+          gh release create dev "$apk" --prerelease --target "$GITHUB_SHA" \
+            --title "Dev build ${GITHUB_RUN_NUMBER}" \
+            --notes "Branch \`${GITHUB_REF_NAME}\`, commit ${GITHUB_SHA::7}. Download the APK on your phone and install it."

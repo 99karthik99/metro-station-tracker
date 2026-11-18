@@ -14,9 +14,24 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = 1
-        versionName = "1.0"
+        // CI builds say which run and commit they came from (shown in Android's app info screen).
+        versionName = System.getenv("GITHUB_RUN_NUMBER")
+            ?.let { "1.0-dev.$it+${System.getenv("GITHUB_SHA").orEmpty().take(7)}" }
+            ?: "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        // A shared debug key, committed on purpose: builds from Android Studio and from CI
+        // (the APK on the "dev" GitHub release) then install over each other. Debug only;
+        // a real release key must never be committed.
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
     }
 
     buildTypes {
