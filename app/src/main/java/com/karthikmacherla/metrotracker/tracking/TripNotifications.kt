@@ -11,6 +11,7 @@ import androidx.core.graphics.toColorInt
 import com.karthikmacherla.metrotracker.MainActivity
 import com.karthikmacherla.metrotracker.MetroData
 import com.karthikmacherla.metrotracker.R
+import com.karthikmacherla.metrotracker.core.GetOffAlert
 
 /**
  * What the trip notification shows. Kept apart from the Notification object so the service
@@ -73,18 +74,21 @@ object TripNotifications {
     }
 
     /**
-     * The heads-up for [stationIndex] (a get-off stop): "Get off at the next stop: Raidurg",
-     * or for an interchange "Change at the next stop: Ameerpet" with the line and direction.
+     * A buzz for a get-off stop. One stop before: "Get off at the next stop: Raidurg". On
+     * arrival: "You've arrived: Raidurg". For an interchange, "Change at the next stop" /
+     * "Change here", with the line and direction to take. Both use the same id, so the
+     * arrival replaces the heads-up instead of stacking.
      */
-    fun buildGetOffAlert(context: Context, trip: ActiveTrip, stationIndex: Int): Notification {
+    fun buildGetOffAlert(context: Context, trip: ActiveTrip, alert: GetOffAlert): Notification {
         val network = MetroData.network
-        val station = network.station(trip.progress.stationIds[stationIndex])
+        val station = network.station(trip.progress.stationIds[alert.stationIndex])
         val nextLeg = trip.route.legs.drop(1).firstOrNull { it.fromStationId == station.id }
-        val (title, text) = if (nextLeg != null) {
-            context.getString(R.string.alert_change_next, station.name) to
+        val arrived = alert.kind == GetOffAlert.Kind.Arrived
+        val (title, text) = when {
+            nextLeg != null -> context.getString(if (arrived) R.string.alert_change_here else R.string.alert_change_next, station.name) to
                 context.getString(R.string.alert_change_take, nextLeg.line.name, network.station(nextLeg.towardsStationId).name)
-        } else {
-            context.getString(R.string.alert_get_off_next, station.name) to context.getString(R.string.alert_get_off_text)
+            arrived -> context.getString(R.string.alert_arrived, station.name) to context.getString(R.string.alert_arrived_text)
+            else -> context.getString(R.string.alert_get_off_next, station.name) to context.getString(R.string.alert_get_off_text)
         }
         val openApp = PendingIntent.getActivity(
             context, 0,
