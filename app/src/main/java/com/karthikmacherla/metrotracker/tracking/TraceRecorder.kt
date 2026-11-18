@@ -1,6 +1,7 @@
 package com.karthikmacherla.metrotracker.tracking
 
 import android.content.Context
+import com.karthikmacherla.metrotracker.core.LocationFix
 import com.karthikmacherla.metrotracker.core.Route
 import java.io.File
 import java.io.Writer
@@ -14,6 +15,8 @@ import java.util.Locale
  *
  * Files: files/traces/<start time>_<from>_<to>.csv. Copy one off a debug build with:
  *   adb shell run-as com.karthikmacherla.metrotracker cat files/traces/<name>.csv > trace.csv
+ *
+ * Not thread-safe: call only from the tracking service's background thread.
  */
 class TraceRecorder(context: Context, route: Route, startedAtMillis: Long) {
     val file: File
@@ -28,7 +31,7 @@ class TraceRecorder(context: Context, route: Route, startedAtMillis: Long) {
         writer.write("timeMillis,lat,lng,accuracyM,speedMps\n")
     }
 
-    fun record(fix: Fix) {
+    fun record(fix: LocationFix) {
         writer.write("${fix.timeMillis},${fix.lat},${fix.lng},${fix.accuracyMeters},${fix.speedMps ?: ""}\n")
         writer.flush() // a trip can end by the process being killed, so don't hold rows in memory
     }

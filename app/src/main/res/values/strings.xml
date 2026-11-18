@@ -15,6 +15,8 @@
     <string name="plan_towards">towards %s</string>
     <string name="plan_change_at">Change at %s</string>
     <string name="plan_change_minutes">~%d min</string>
+    <string name="plan_your_trips">Your trips</string>
+    <string name="plan_trip_pair">%1$s → %2$s</string>
 
     <plurals name="plan_stops">
         <item quantity="one">%d stop</item>
@@ -30,8 +32,28 @@
     <string name="picker_cancel">Cancel</string>
     <string name="picker_no_results">No station matches \"%s\"</string>
 
-    <!-- Active trip (plan screen banner) -->
-    <string name="trip_in_progress">Trip in progress</string>
+    <!-- Trip screen -->
+    <string name="trip_to">To %s</string>
+    <string name="trip_arrived">You\'ve arrived at %s</string>
+    <string name="trip_arrive_at">arrive %s</string>
+    <string name="trip_done_label">done</string>
+    <plurals name="trip_stops_left_label">
+        <item quantity="one">stop left</item>
+        <item quantity="other">stops left</item>
+    </plurals>
+    <plurals name="trip_stations_passed">
+        <item quantity="one">%d station passed</item>
+        <item quantity="other">%d stations passed</item>
+    </plurals>
+    <string name="trip_tag_here">you\'re here</string>
+    <string name="trip_tag_next">next</string>
+    <string name="trip_tag_change">change to %s</string>
+    <string name="trip_tap_to_correct">Wrong station? Tap where you are.</string>
+    <string name="trip_status_waiting_gps">Waiting for GPS…</string>
+    <string name="trip_status_gps_lost">GPS signal lost · times are estimates</string>
+    <string name="trip_status_stopped_at">Stopped at %s</string>
+    <string name="trip_status_stopped">Stopped</string>
+    <string name="trip_status_moving">Moving · %d km/h</string>
     <string name="trip_end">End trip</string>
     <string name="trip_notifications_off">Notifications are off, so you won\'t get stop alerts.</string>
 
@@ -57,14 +79,17 @@
     <!-- Trip notification -->
     <string name="channel_trip_name">Current trip</string>
     <string name="channel_trip_description">Shows your trip progress while a trip is running</string>
-    <string name="notif_title_tracking">Tracking your trip</string>
-    <string name="notif_arrive_in">Arrive in %1$d min · %2$s</string>
-    <string name="notif_arrive_under_minute">Arrive in &lt;1 min · %s</string>
-    <string name="notif_past_estimate">Past estimate (%s)</string>
-    <string name="notif_waiting_for_location">Waiting for location…</string>
-    <plurals name="notif_location_status">
-        <item quantity="one">Location ±%1$d m · %2$d reading</item>
-        <item quantity="other">Location ±%1$d m · %2$d readings</item>
+    <string name="notif_next">Next: %s</string>
+    <string name="notif_next_change">Next: %s · change</string>
+    <string name="notif_next_get_off">Next: %s · get off</string>
+    <string name="notif_arrived">Arrived: %s</string>
+    <string name="notif_trip_ends_soon">Trip ends in 2 min</string>
+    <string name="notif_minutes">%d min</string>
+    <string name="notif_under_minute">&lt;1 min</string>
+    <string name="notif_percent">%d%%</string>
+    <plurals name="notif_stops_left">
+        <item quantity="one">%d stop left</item>
+        <item quantity="other">%d stops left</item>
     </plurals>
     <string name="notif_end_trip">End trip</string>
 </resources>

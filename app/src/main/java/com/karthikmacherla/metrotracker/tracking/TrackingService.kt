@@ -9,8 +9,9 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.location.Location
 import android.os.Build
+import android.os.Handler
+import android.os.HandlerThread
 import android.os.IBinder
-import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
@@ -21,6 +22,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.karthikmacherla.metrotracker.MetroData
+import com.karthikmacherla.metrotracker.core.LocationFix
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -36,6 +38,10 @@ import kotlinx.coroutines.launch
  *
  * Started from the app while it's on screen, so "while using the app" location
  * permission covers the whole trip (no background location permission needed).
+ *
+ * Kept light on the phone (D27): location callbacks, trace writes and station detection
+ * run on a background thread, never the main one; the notification is re-posted only when
+ * what it shows changes (about once a minute), because every post makes the system UI redraw.
  */
 class TrackingService : Service() {
 
@@ -46,11 +52,15 @@ class TrackingService : Service() {
         private const val EXTRA_TO = "to"
         private const val TAG = "TrackingService"
 
-        /** Frequent updates while we collect real ride data; to be relaxed for battery once detection is tuned. */
-        private const val LOCATION_INTERVAL_MS = 5_000L
-        private const val NOTIFICATION_REFRESH_MS = 30_000L
+        /** Replays of real rides show 10 s between fixes is enough to catch every station (D27). */
+        private const val LOCATION_INTERVAL_MS = 10_000L
+        /** How often to recheck the clock-driven parts: minutes left and auto-end. */
+        private const val TICK_MS = 15_000L
 
-        /** Safety net until arrival detection exists: end a trip running this long past its estimate. */
+        /** The trip ends itself this long after arrival (F15). */
+        private const val END_AFTER_ARRIVAL_MS = 2 * 60_000L
+
+        /** Safety net if arrival is never detected (e.g. GPS lost): end a trip running this long past its estimate. */
         private const val OVERRUN_LIMIT_MS = 30 * 60_000L
 
         fun start(context: Context, fromStationId: String, toStationId: String) {
@@ -66,9 +76,13 @@ class TrackingService : Service() {
         }
     }
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    /** Background thread that receives location fixes and does all per-fix work. */
+    private val locationThread = HandlerThread("trip-location").apply { start() }
+    private val locationHandler = Handler(locationThread.looper)
+    private var lastPosted: TripNotificationContent? = null
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
-    private var recorder: TraceRecorder? = null
+    @Volatile private var recorder: TraceRecorder? = null
     private var tracking = false
 
     private val locationCallback = object : LocationCallback() {
@@ -104,7 +118,7 @@ class TrackingService : Service() {
             ServiceCompat.startForeground(
                 this,
                 TripNotifications.NOTIFICATION_ID,
-                TripNotifications.build(this, trip, now),
+                TripNotifications.build(this, TripNotifications.content(this, trip, now)),
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION else 0,
             )
         } catch (e: Exception) {
@@ -116,13 +130,19 @@ class TrackingService : Service() {
         if (tracking) return
         tracking = true
 
-        recorder = TraceRecorder(this, trip.route, trip.startedAtMillis)
+        // Opening the file is disk work, so it happens on the location thread too (before any fix arrives there).
+        locationHandler.post { recorder = TraceRecorder(this, trip.route, trip.startedAtMillis) }
         requestLocationUpdates()
+        // Progress changes (new fix, or the rider correcting their station) update the notification.
+        scope.launch { TripRepository.activeTrip.collect { refreshNotification() } }
         scope.launch {
             while (isActive) {
-                delay(NOTIFICATION_REFRESH_MS)
+                delay(TICK_MS)
                 val current = TripRepository.activeTrip.value ?: break
-                if (System.currentTimeMillis() > current.estimatedArrivalMillis + OVERRUN_LIMIT_MS) {
+                val nowMillis = System.currentTimeMillis()
+                val arrivedAt = current.arrivedAtMillis
+                val overran = nowMillis > current.estimatedArrivalMillis + OVERRUN_LIMIT_MS
+                if (overran || (arrivedAt != null && nowMillis > arrivedAt + END_AFTER_ARRIVAL_MS)) {
                     stopSelf()
                     break
                 }
@@ -140,28 +160,33 @@ class TrackingService : Service() {
         val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_INTERVAL_MS)
             .setMinUpdateIntervalMillis(LOCATION_INTERVAL_MS / 2)
             .build()
-        locationClient.requestLocationUpdates(request, locationCallback, Looper.getMainLooper())
+        locationClient.requestLocationUpdates(request, locationCallback, locationThread.looper)
     }
 
+    /** Runs on [locationThread]. */
     private fun onLocation(location: Location) {
-        val fix = Fix(
+        val fix = LocationFix(
             lat = location.latitude,
             lng = location.longitude,
             accuracyMeters = location.accuracy,
-            speedMps = if (location.hasSpeed()) location.speed else null,
             timeMillis = location.time,
+            speedMps = if (location.hasSpeed()) location.speed else null,
         )
-        TripRepository.recordFix(fix)
+        TripRepository.recordFix(fix, System.currentTimeMillis())
         recorder?.record(fix)
-        refreshNotification()
     }
 
+    /** Re-posts the notification only if what it shows has changed. Called from two background threads. */
     @SuppressLint("MissingPermission") // checked by canNotify()
+    @Synchronized
     private fun refreshNotification() {
         val trip = TripRepository.activeTrip.value ?: return
         if (!canNotify()) return
+        val content = TripNotifications.content(this, trip, System.currentTimeMillis())
+        if (content == lastPosted) return
+        lastPosted = content
         NotificationManagerCompat.from(this)
-            .notify(TripNotifications.NOTIFICATION_ID, TripNotifications.build(this, trip, System.currentTimeMillis()))
+            .notify(TripNotifications.NOTIFICATION_ID, TripNotifications.build(this, content))
     }
 
     private fun canNotify(): Boolean =
@@ -173,7 +198,12 @@ class TrackingService : Service() {
     override fun onDestroy() {
         locationClient.removeLocationUpdates(locationCallback)
         scope.cancel()
-        recorder?.close()
+        // Close the trace on the thread that writes it, after any fix already queued.
+        locationHandler.post {
+            recorder?.close()
+            recorder = null
+        }
+        locationThread.quitSafely()
         TripRepository.end()
         super.onDestroy()
     }

@@ -19,14 +19,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,7 +49,6 @@ import com.karthikmacherla.metrotracker.core.NetworkLoader
 import com.karthikmacherla.metrotracker.core.Route
 import com.karthikmacherla.metrotracker.core.RoutePlanner
 import com.karthikmacherla.metrotracker.core.Station
-import com.karthikmacherla.metrotracker.tracking.ActiveTrip
 import com.karthikmacherla.metrotracker.ui.theme.MetroTrackerTheme
 
 private enum class PickTarget { From, To }
@@ -69,9 +65,7 @@ fun PlanScreen(
     onSwap: () -> Unit,
     onStartTrip: () -> Unit,
     modifier: Modifier = Modifier,
-    activeTrip: ActiveTrip? = null,
-    notificationsOff: Boolean = false,
-    onEndTrip: () -> Unit = {},
+    onSelectTrip: (fromStationId: String, toStationId: String) -> Unit = { _, _ -> },
 ) {
     val network = state.network
     if (network == null) {
@@ -104,8 +98,8 @@ fun PlanScreen(
         Text(stringResource(R.string.plan_title), style = MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(20.dp))
 
-        activeTrip?.let {
-            ActiveTripBanner(it, network, notificationsOff, onEndTrip)
+        if (state.suggestedTrips.isNotEmpty()) {
+            SuggestedTrips(state.suggestedTrips, network, onSelectTrip)
             Spacer(Modifier.height(20.dp))
         }
 
@@ -130,32 +124,39 @@ fun PlanScreen(
             HorizontalDivider()
             Spacer(Modifier.height(16.dp))
             RoutePreview(route, network)
-            // One trip at a time: while one runs, the banner above offers End trip instead.
-            if (activeTrip == null) {
-                Spacer(Modifier.height(24.dp))
-                Button(onClick = onStartTrip, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.plan_start_trip))
-                }
+            Spacer(Modifier.height(24.dp))
+            Button(onClick = onStartTrip, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.plan_start_trip))
             }
         }
     }
 }
 
+/** One-tap trips: the return of the last trip first, then the most frequent (F11). */
 @Composable
-private fun ActiveTripBanner(trip: ActiveTrip, network: MetroNetwork, notificationsOff: Boolean, onEndTrip: () -> Unit) {
-    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-        Column(Modifier.padding(16.dp).fillMaxWidth()) {
-            Text(stringResource(R.string.trip_in_progress), style = MaterialTheme.typography.titleMedium)
-            Text(
-                network.station(trip.route.fromStationId).name + " → " + network.station(trip.route.toStationId).name,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            if (notificationsOff) {
-                Spacer(Modifier.height(6.dp))
-                Text(stringResource(R.string.trip_notifications_off), style = MaterialTheme.typography.bodySmall)
+private fun SuggestedTrips(trips: List<Pair<Station, Station>>, network: MetroNetwork, onSelectTrip: (String, String) -> Unit) {
+    Text(
+        stringResource(R.string.plan_your_trips),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Spacer(Modifier.height(4.dp))
+    trips.forEach { (from, to) ->
+        OutlinedCard(
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 3.dp)
+                .clickable { onSelectTrip(from.id, to.id) },
+        ) {
+            Row(Modifier.padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                LineDots(network, from.id)
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    stringResource(R.string.plan_trip_pair, from.name, to.name),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f),
+                )
             }
-            Spacer(Modifier.height(12.dp))
-            OutlinedButton(onClick = onEndTrip) { Text(stringResource(R.string.trip_end)) }
         }
     }
 }
