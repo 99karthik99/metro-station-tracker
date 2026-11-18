@@ -129,7 +129,7 @@ Station   { id, name, lat, lng }                  // which lines a station is on
 Transfer  { stationId, seconds }                  // interchange walk + wait, default 300 s
 
 // Computed in code
-segmentSeconds(a, b) = dwell (25 s) + distance(a, b) / cruise speed (45 km/h)   // TravelTimeModel; calibrate from real rides
+segmentSeconds(a, b) = dwell (25 s) + accel/brake (10 s) + distance(a, b) / speed (36 km/h)   // TravelTimeModel; calibrated on real rides (D26)
 RouteLeg  { lineId, stationIds[] }            // one leg per line ridden
 Trip      { startId, endId, legs[], currentLegIndex, currentStationIndex, startedAt, eta }
 ```
