@@ -22,6 +22,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.karthikmacherla.metrotracker.MetroData
+import com.karthikmacherla.metrotracker.core.GetOffAlerts
 import com.karthikmacherla.metrotracker.core.LocationFix
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -84,6 +85,8 @@ class TrackingService : Service() {
     private val locationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     @Volatile private var recorder: TraceRecorder? = null
     private var tracking = false
+    /** Only touched by the coroutine that collects trip updates. */
+    private var alerts: GetOffAlerts? = null
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
@@ -134,7 +137,13 @@ class TrackingService : Service() {
         locationHandler.post { recorder = TraceRecorder(this, trip.route, trip.startedAtMillis) }
         requestLocationUpdates()
         // Progress changes (new fix, or the rider correcting their station) update the notification.
-        scope.launch { TripRepository.activeTrip.collect { refreshNotification() } }
+        alerts = GetOffAlerts(trip.route)
+        scope.launch {
+            TripRepository.activeTrip.collect { current ->
+                refreshNotification()
+                current?.let { alerts?.check(it.progress)?.let { index -> postGetOffAlert(it, index) } }
+            }
+        }
         scope.launch {
             while (isActive) {
                 delay(TICK_MS)
@@ -187,6 +196,13 @@ class TrackingService : Service() {
         lastPosted = content
         NotificationManagerCompat.from(this)
             .notify(TripNotifications.NOTIFICATION_ID, TripNotifications.build(this, content))
+    }
+
+    @SuppressLint("MissingPermission") // checked by canNotify()
+    private fun postGetOffAlert(trip: ActiveTrip, stationIndex: Int) {
+        if (!canNotify()) return
+        NotificationManagerCompat.from(this)
+            .notify(TripNotifications.GET_OFF_ALERT_ID, TripNotifications.buildGetOffAlert(this, trip, stationIndex))
     }
 
     private fun canNotify(): Boolean =

@@ -41,6 +41,14 @@ object TripNotifications {
     private const val OLD_CHANNEL_TRIP = "trip"
     const val NOTIFICATION_ID = 1
 
+    /** "Get off at the next stop" heads-up: high importance, so it pops up and buzzes (D32). */
+    const val CHANNEL_ALERTS = "trip_alerts"
+    const val GET_OFF_ALERT_ID = 2
+    /** Two long pulses: easy to feel through a pocket on a noisy train (D10). */
+    private val ALERT_VIBRATION = longArrayOf(0, 700, 300, 700)
+    /** The heads-up stays in the shade until the stop after it is surely reached. */
+    private const val ALERT_TIMEOUT_MS = 5 * 60_000L
+
     /** Channels are how users control notifications per type in system settings. Safe to call repeatedly. */
     fun ensureChannels(context: Context) {
         val manager = NotificationManagerCompat.from(context)
@@ -53,6 +61,48 @@ object TripNotifications {
             .setShowBadge(false)
             .build()
         manager.createNotificationChannel(channel)
+
+        val alerts = NotificationChannelCompat.Builder(CHANNEL_ALERTS, NotificationManagerCompat.IMPORTANCE_HIGH)
+            .setName(context.getString(R.string.channel_alerts_name))
+            .setDescription(context.getString(R.string.channel_alerts_description))
+            .setVibrationEnabled(true)
+            .setVibrationPattern(ALERT_VIBRATION)
+            .setShowBadge(false)
+            .build()
+        manager.createNotificationChannel(alerts)
+    }
+
+    /**
+     * The heads-up for [stationIndex] (a get-off stop): "Get off at the next stop: Raidurg",
+     * or for an interchange "Change at the next stop: Ameerpet" with the line and direction.
+     */
+    fun buildGetOffAlert(context: Context, trip: ActiveTrip, stationIndex: Int): Notification {
+        val network = MetroData.network
+        val station = network.station(trip.progress.stationIds[stationIndex])
+        val nextLeg = trip.route.legs.drop(1).firstOrNull { it.fromStationId == station.id }
+        val (title, text) = if (nextLeg != null) {
+            context.getString(R.string.alert_change_next, station.name) to
+                context.getString(R.string.alert_change_take, nextLeg.line.name, network.station(nextLeg.towardsStationId).name)
+        } else {
+            context.getString(R.string.alert_get_off_next, station.name) to context.getString(R.string.alert_get_off_text)
+        }
+        val openApp = PendingIntent.getActivity(
+            context, 0,
+            Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            PendingIntent.FLAG_IMMUTABLE,
+        )
+        return NotificationCompat.Builder(context, CHANNEL_ALERTS)
+            .setSmallIcon(R.drawable.ic_stat_train)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setContentIntent(openApp)
+            .setAutoCancel(true)
+            .setTimeoutAfter(ALERT_TIMEOUT_MS)
+            .setVibrate(ALERT_VIBRATION) // used before Android 8, where channels don't exist
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .build()
     }
 
     /**

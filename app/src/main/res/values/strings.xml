@@ -79,6 +79,12 @@
     <!-- Trip notification -->
     <string name="channel_trip_name">Current trip</string>
     <string name="channel_trip_description">Shows your trip progress while a trip is running</string>
+    <string name="channel_alerts_name">Get off alerts</string>
+    <string name="channel_alerts_description">Buzzes one stop before you need to get off or change lines</string>
+    <string name="alert_get_off_next">Get off at the next stop: %s</string>
+    <string name="alert_get_off_text">Head to the doors</string>
+    <string name="alert_change_next">Change at the next stop: %s</string>
+    <string name="alert_change_take">Take the %1$s towards %2$s</string>
     <string name="notif_next">Next: %s</string>
     <string name="notif_next_change">Next: %s · change</string>
     <string name="notif_next_get_off">Next: %s · get off</string>
