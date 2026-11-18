@@ -9,7 +9,6 @@
     <string name="plan_swap">Swap start and destination</string>
     <string name="plan_same_station">Start and destination are the same station</string>
     <string name="plan_start_trip">Start trip</string>
-    <string name="plan_tracking_not_ready">Trip tracking is coming in the next step</string>
     <string name="plan_minutes">%d min</string>
     <string name="plan_no_changes">no changes</string>
     <string name="plan_leg_title">%1$s to %2$s</string>
@@ -30,4 +29,42 @@
     <string name="picker_search">Search stations</string>
     <string name="picker_cancel">Cancel</string>
     <string name="picker_no_results">No station matches \"%s\"</string>
+
+    <!-- Active trip (plan screen banner) -->
+    <string name="trip_in_progress">Trip in progress</string>
+    <string name="trip_end">End trip</string>
+    <string name="trip_notifications_off">Notifications are off, so you won\'t get stop alerts.</string>
+
+    <!-- Permissions (PRD §4a) -->
+    <string name="perm_title">Two quick permissions</string>
+    <string name="perm_subtitle">So we can tell you when to get off.</string>
+    <string name="perm_location_title">Precise location</string>
+    <string name="perm_location_body">To know which station you\'re at. Stations are less than 1 km apart, so approximate location isn\'t enough.</string>
+    <string name="perm_notifications_title">Notifications</string>
+    <string name="perm_notifications_body">To show your next stop and buzz before you need to get off.</string>
+    <string name="perm_privacy_title">Only during a trip</string>
+    <string name="perm_privacy_body">Location is used only while a trip is running and never leaves your phone.</string>
+    <string name="perm_continue">Continue</string>
+    <string name="perm_not_now">Not now</string>
+    <string name="perm_precise_off_title">Precise location is off</string>
+    <string name="perm_precise_off_body">Approximate location can be off by 1–3 km. Metro stations are closer together than that, so we can\'t tell which one you\'re at.</string>
+    <string name="perm_denied_title">Location is off</string>
+    <string name="perm_denied_body">The app needs your location during a trip to know which station you\'re at.</string>
+    <string name="perm_settings_hint">In settings: Permissions → Location → Allow only while using the app, with Use precise location on</string>
+    <string name="perm_open_settings">Open settings</string>
+    <string name="perm_back">Back to plan</string>
+
+    <!-- Trip notification -->
+    <string name="channel_trip_name">Current trip</string>
+    <string name="channel_trip_description">Shows your trip progress while a trip is running</string>
+    <string name="notif_title_tracking">Tracking your trip</string>
+    <string name="notif_arrive_in">Arrive in %1$d min · %2$s</string>
+    <string name="notif_arrive_under_minute">Arrive in &lt;1 min · %s</string>
+    <string name="notif_past_estimate">Past estimate (%s)</string>
+    <string name="notif_waiting_for_location">Waiting for location…</string>
+    <plurals name="notif_location_status">
+        <item quantity="one">Location ±%1$d m · %2$d reading</item>
+        <item quantity="other">Location ±%1$d m · %2$d readings</item>
+    </plurals>
+    <string name="notif_end_trip">End trip</string>
 </resources>
