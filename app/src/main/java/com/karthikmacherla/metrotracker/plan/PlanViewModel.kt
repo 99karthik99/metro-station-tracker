@@ -1,9 +1,10 @@
 package com.karthikmacherla.metrotracker.plan
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.karthikmacherla.metrotracker.MetroData
 import com.karthikmacherla.metrotracker.core.MetroNetwork
-import com.karthikmacherla.metrotracker.core.NetworkLoader
 import com.karthikmacherla.metrotracker.core.Route
 import com.karthikmacherla.metrotracker.core.RoutePlanner
 import com.karthikmacherla.metrotracker.core.Station
@@ -23,6 +24,8 @@ data class PlanUiState(
     val to: Station? = null,
     /** Set when both stations are chosen and different. */
     val route: Route? = null,
+    /** One-tap trips (from, to), best guess first. */
+    val suggestedTrips: List<Pair<Station, Station>> = emptyList(),
 ) {
     val isSameStation: Boolean get() = from != null && from.id == to?.id
 }
@@ -31,7 +34,9 @@ data class PlanUiState(
  * Holds the plan screen's state. A ViewModel survives configuration changes such as
  * rotation, so the chosen stations aren't lost when the Activity is recreated.
  */
-class PlanViewModel : ViewModel() {
+class PlanViewModel(application: Application) : AndroidViewModel(application) {
+    private val recentTrips = RecentTrips(application)
+
     private val _state = MutableStateFlow(PlanUiState())
     val state: StateFlow<PlanUiState> = _state.asStateFlow()
 
@@ -40,10 +45,35 @@ class PlanViewModel : ViewModel() {
     init {
         viewModelScope.launch {
             // Parsing JSON is work, so it runs off the main (UI) thread.
-            val network = withContext(Dispatchers.Default) { NetworkLoader.loadHyderabad() }
-            planner = RoutePlanner(network)
+            val network = withContext(Dispatchers.Default) { MetroData.network }
+            planner = MetroData.planner
             _state.update { it.copy(network = network) }
+            loadSuggestions()
         }
+    }
+
+    /** Fills both stations from a suggested trip. */
+    fun selectTrip(fromStationId: String, toStationId: String) =
+        updateStations(from = station(fromStationId), to = station(toStationId))
+
+    /** Remembers a started trip so it's offered next time. */
+    fun recordTrip(fromStationId: String, toStationId: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { recentTrips.record(fromStationId, toStationId, System.currentTimeMillis()) }
+            loadSuggestions()
+        }
+    }
+
+    private suspend fun loadSuggestions() {
+        val trips = withContext(Dispatchers.IO) { recentTrips.all() }
+        val network = _state.value.network ?: return
+        // Skip trips whose stations are no longer in the data (e.g. after a data update).
+        val suggested = RecentTrips.suggestions(trips).mapNotNull { (from, to) ->
+            val a = network.stations[from] ?: return@mapNotNull null
+            val b = network.stations[to] ?: return@mapNotNull null
+            a to b
+        }
+        _state.update { it.copy(suggestedTrips = suggested) }
     }
 
     fun selectFrom(stationId: String) = updateStations(from = station(stationId), to = _state.value.to)

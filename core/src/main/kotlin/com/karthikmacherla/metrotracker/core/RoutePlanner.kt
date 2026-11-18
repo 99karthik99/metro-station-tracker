@@ -5,14 +5,20 @@ import kotlin.math.roundToInt
 
 /**
  * Estimates ride time between adjacent stations from straight-line distance.
- * Placeholder constants: calibrate them against real rides (PRD §7).
+ *
+ * Calibrated on two Blue Line rides (31 segments, 2026-11-18; traces in core/src/test/resources/traces):
+ * the train stood still ~25 s per stop, a fit over all segments gave ~35 s fixed cost per stop
+ * (the extra ~10 s is braking and pulling away), and the average speed between stations was ~36 km/h.
  */
 data class TravelTimeModel(
+    /** Time the train stands at a platform. */
     val dwellSeconds: Int = 25,
-    val cruiseSpeedKmh: Double = 45.0,
+    /** Time lost slowing into and pulling out of each station, compared with travelling at [cruiseSpeedKmh]. */
+    val accelBrakeSeconds: Int = 10,
+    val cruiseSpeedKmh: Double = 36.0,
 ) {
     fun segmentSeconds(a: Station, b: Station): Int =
-        dwellSeconds + (distanceMeters(a, b) / (cruiseSpeedKmh / 3.6)).roundToInt()
+        dwellSeconds + accelBrakeSeconds + (distanceMeters(a, b) / (cruiseSpeedKmh / 3.6)).roundToInt()
 }
 
 /** One continuous ride on a single line. [stationIds] runs from boarding to alighting station. */

@@ -1,10 +1,11 @@
-# Runs the unit tests and builds the debug app on every pull request and on pushes to main.
+# Runs the unit tests and builds the debug app on every pull request and on pushes to main
+# and claude/** branches. Nothing is published; installable APKs come from build-apk.yml.
 name: CI
 
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, "claude/**"]
 
 # A newer push to the same branch cancels the run that is still going.
 concurrency:
@@ -38,3 +39,4 @@ jobs:
           path: |
             core/build/reports/tests/
             app/build/reports/tests/
+

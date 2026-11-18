@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 import com.karthikmacherla.metrotracker.R
 import com.karthikmacherla.metrotracker.core.Line
 import com.karthikmacherla.metrotracker.core.MetroNetwork
@@ -64,6 +65,7 @@ fun PlanScreen(
     onSwap: () -> Unit,
     onStartTrip: () -> Unit,
     modifier: Modifier = Modifier,
+    onSelectTrip: (fromStationId: String, toStationId: String) -> Unit = { _, _ -> },
 ) {
     val network = state.network
     if (network == null) {
@@ -96,6 +98,11 @@ fun PlanScreen(
         Text(stringResource(R.string.plan_title), style = MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(20.dp))
 
+        if (state.suggestedTrips.isNotEmpty()) {
+            SuggestedTrips(state.suggestedTrips, network, onSelectTrip)
+            Spacer(Modifier.height(20.dp))
+        }
+
         StationField(stringResource(R.string.plan_from), state.from, network) { picking = PickTarget.From }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             IconButton(onClick = onSwap, enabled = state.from != null || state.to != null) {
@@ -120,6 +127,35 @@ fun PlanScreen(
             Spacer(Modifier.height(24.dp))
             Button(onClick = onStartTrip, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.plan_start_trip))
+            }
+        }
+    }
+}
+
+/** One-tap trips: the return of the last trip first, then the most frequent (F11). */
+@Composable
+private fun SuggestedTrips(trips: List<Pair<Station, Station>>, network: MetroNetwork, onSelectTrip: (String, String) -> Unit) {
+    Text(
+        stringResource(R.string.plan_your_trips),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Spacer(Modifier.height(4.dp))
+    trips.forEach { (from, to) ->
+        OutlinedCard(
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 3.dp)
+                .clickable { onSelectTrip(from.id, to.id) },
+        ) {
+            Row(Modifier.padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                LineDots(network, from.id)
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    stringResource(R.string.plan_trip_pair, from.name, to.name),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
     }
@@ -212,7 +248,7 @@ private fun LegRow(dotColor: Color?, title: String, subtitle: String?, trailing:
 private fun minutesCeil(seconds: Int): Int = (seconds + 59) / 60
 
 /** Line colours come from the station data as "#RRGGBB". */
-fun lineColor(line: Line): Color = Color(android.graphics.Color.parseColor(line.color))
+fun lineColor(line: Line): Color = Color(line.color.toColorInt())
 
 @Preview(showBackground = true, heightDp = 720)
 @Composable

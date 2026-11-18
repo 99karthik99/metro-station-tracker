@@ -84,6 +84,16 @@ class RoutePlannerTest {
     }
 
     @Test
+    fun `Blue Line estimates match recorded rides`() {
+        // Measured from traces/20261118-*.csv, station stop to station stop.
+        val outbound = planner.plan("tarnaka", "raidurg").totalSeconds / 60.0
+        val inbound = planner.plan("madhapur", "tarnaka").totalSeconds / 60.0
+
+        assertEquals("tarnaka -> raidurg", 39.5, outbound, 2.0)
+        assertEquals("madhapur -> tarnaka", 32.5, inbound, 2.0)
+    }
+
+    @Test
     fun `every pair of stations has a route`() {
         val ids = network.stations.keys.toList()
         for (from in ids) for (to in ids) if (from != to) planner.plan(from, to)
