@@ -87,6 +87,7 @@
     <string name="notif_minutes">%d min</string>
     <string name="notif_under_minute">&lt;1 min</string>
     <string name="notif_percent">%d%%</string>
+    <string name="notif_chip_arrived">Arrived</string>
     <plurals name="notif_stops_left">
         <item quantity="one">%d stop left</item>
         <item quantity="other">%d stops left</item>
