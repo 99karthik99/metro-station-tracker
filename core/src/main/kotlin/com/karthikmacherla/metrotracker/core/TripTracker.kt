@@ -24,8 +24,10 @@ data class TripProgress(
     val atStation: Boolean,
     /** Share of the route's length covered, 0.0 to 1.0. */
     val fraction: Double,
-    /** Estimated seconds still to ride, including any remaining interchange walks. */
+    /** Estimated seconds still to ride from here, including any remaining interchange walks. */
     val remainingSeconds: Int,
+    /** The part of [remainingSeconds] after the next station: still to ride however long the train is held now. */
+    val remainingAfterNextStationSeconds: Int,
     /** True once the rider is at the destination. */
     val arrived: Boolean,
 ) {
@@ -34,6 +36,28 @@ data class TripProgress(
     /** Stations still to reach, counting the destination. */
     val stopsLeft: Int get() = stationIds.lastIndex - lastStationIndex
     val percent: Int get() = (fraction * 100).roundToInt().coerceIn(0, 100)
+
+    /**
+     * Still at the starting station: waiting on the platform, on a train that hasn't left,
+     * or not even at the station yet (fixes off the route don't move the position).
+     */
+    val waitingToDepart: Boolean get() = lastStationIndex == 0 && atStation
+}
+
+/**
+ * When the rider should arrive, given [progress] as computed at [progressAtMillis].
+ *
+ * - Before departure, nobody knows when the train comes, so the estimate is "the full ride,
+ *   starting now": it moves later the longer the rider waits.
+ * - Once moving, it counts down from the last position update, so the time left keeps
+ *   falling between fixes. If the train is held (signal, long dwell) past what that allows,
+ *   it slips: the rest of the route after the next station still has to be ridden.
+ */
+fun estimateArrivalMillis(progress: TripProgress, progressAtMillis: Long, nowMillis: Long): Long {
+    if (progress.arrived) return progressAtMillis
+    val fromUpdate = progressAtMillis + progress.remainingSeconds * 1000L
+    if (progress.waitingToDepart) return max(fromUpdate, nowMillis + progress.remainingSeconds * 1000L)
+    return max(fromUpdate, nowMillis + progress.remainingAfterNextStationSeconds * 1000L)
 }
 
 /**
@@ -125,11 +149,13 @@ class TripTracker(
         val arrived = last == stations.lastIndex
 
         var remaining = 0.0
+        var afterNext = 0
         if (!arrived) {
+            for (i in last + 1 until segmentSeconds.size) afterNext += segmentSeconds[i]
             val segLength = stationPosition[last + 1] - stationPosition[last]
             val done = ((position - stationPosition[last]) / segLength).coerceIn(0.0, 1.0)
             remaining = segmentSeconds[last] * (1 - done)
-            for (i in last + 1 until segmentSeconds.size) remaining += segmentSeconds[i]
+            remaining += afterNext
         }
         return TripProgress(
             stationIds = stationIds,
@@ -137,6 +163,7 @@ class TripTracker(
             atStation = atStation,
             fraction = if (arrived || totalLength == 0.0) 1.0 else (position / totalLength).coerceIn(0.0, 1.0),
             remainingSeconds = remaining.roundToInt(),
+            remainingAfterNextStationSeconds = afterNext,
             arrived = arrived,
         )
     }

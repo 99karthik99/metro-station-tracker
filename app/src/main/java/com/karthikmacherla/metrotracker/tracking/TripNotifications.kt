@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.text.format.DateFormat
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -12,6 +13,7 @@ import com.karthikmacherla.metrotracker.MainActivity
 import com.karthikmacherla.metrotracker.MetroData
 import com.karthikmacherla.metrotracker.R
 import com.karthikmacherla.metrotracker.core.GetOffAlert
+import java.util.Date
 
 /**
  * What the trip notification shows. Kept apart from the Notification object so the service
@@ -112,7 +114,7 @@ object TripNotifications {
     /**
      * Short lines, key words first, so nothing is cut off with "…" in the collapsed view:
      *   title  "Next: Begumpet"
-     *   text   "6 stops left · 14 min"
+     *   text   "6 stops left · 14 min · 09:53"
      *   header "Metro Tracker · 62%", with a progress bar below the text.
      */
     fun content(context: Context, trip: ActiveTrip, nowMillis: Long): TripNotificationContent {
@@ -140,7 +142,8 @@ object TripNotifications {
         val minutes = minutesLeft(trip, nowMillis)
         val stops = res.getQuantityString(R.plurals.notif_stops_left, progress.stopsLeft, progress.stopsLeft)
         val time = if (minutes < 1) context.getString(R.string.notif_under_minute) else context.getString(R.string.notif_minutes, minutes)
-        return TripNotificationContent(title, "$stops · $time", progress.percent, chipText = time, segments = segments)
+        val eta = DateFormat.getTimeFormat(context).format(Date(trip.estimatedArrivalMillis(nowMillis)))
+        return TripNotificationContent(title, "$stops · $time · $eta", progress.percent, chipText = time, segments = segments)
     }
 
     fun build(context: Context, content: TripNotificationContent): Notification {
@@ -193,4 +196,4 @@ object TripNotifications {
 
 /** Whole minutes to the destination, rounded up so "0 min" never shows before arrival. */
 fun minutesLeft(trip: ActiveTrip, nowMillis: Long): Int =
-    ((trip.estimatedArrivalMillis - nowMillis).coerceAtLeast(0) + 59_999).div(60_000).toInt()
+    ((trip.estimatedArrivalMillis(nowMillis) - nowMillis).coerceAtLeast(0) + 59_999).div(60_000).toInt()

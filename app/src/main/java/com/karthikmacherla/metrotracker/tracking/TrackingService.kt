@@ -62,8 +62,12 @@ class TrackingService : Service() {
         /** The trip ends itself this long after arrival (F15). */
         private const val END_AFTER_ARRIVAL_MS = 2 * 60_000L
 
-        /** Safety net if arrival is never detected (e.g. GPS lost): end a trip running this long past its estimate. */
-        private const val OVERRUN_LIMIT_MS = 30 * 60_000L
+        /**
+         * Safety net if arrival is never detected (e.g. GPS lost, or a trip started and forgotten):
+         * end a trip running this long past the route's ride time. Counted from the start, since
+         * the arrival estimate keeps moving later while the rider hasn't boarded.
+         */
+        private const val OVERRUN_LIMIT_MS = 45 * 60_000L
 
         fun start(context: Context, fromStationId: String, toStationId: String) {
             val intent = Intent(context, TrackingService::class.java)
@@ -151,7 +155,7 @@ class TrackingService : Service() {
                 val current = TripRepository.activeTrip.value ?: break
                 val nowMillis = System.currentTimeMillis()
                 val arrivedAt = current.arrivedAtMillis
-                val overran = nowMillis > current.estimatedArrivalMillis + OVERRUN_LIMIT_MS
+                val overran = nowMillis > current.startedAtMillis + current.route.totalSeconds * 1000L + OVERRUN_LIMIT_MS
                 if (overran || (arrivedAt != null && nowMillis > arrivedAt + END_AFTER_ARRIVAL_MS)) {
                     stopSelf()
                     break

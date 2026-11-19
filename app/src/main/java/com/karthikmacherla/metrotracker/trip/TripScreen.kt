@@ -97,7 +97,7 @@ fun TripScreen(
             Text(headline, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Medium)
             Spacer(Modifier.height(16.dp))
 
-            val arrival = DateFormat.getTimeFormat(LocalContext.current).format(Date(trip.estimatedArrivalMillis))
+            val arrival = DateFormat.getTimeFormat(LocalContext.current).format(Date(trip.estimatedArrivalMillis(now)))
             Row(Modifier.fillMaxWidth()) {
                 Stat(stringResource(R.string.notif_minutes, minutesLeft(trip, now)), stringResource(R.string.trip_arrive_at, arrival), Modifier.weight(1f))
                 Stat(progress.stopsLeft.toString(), pluralStringResource(R.plurals.trip_stops_left_label, progress.stopsLeft), Modifier.weight(1f))
@@ -141,6 +141,7 @@ private fun statusLine(trip: ActiveTrip, network: MetroNetwork, now: Long): Stri
     return when {
         fix == null -> stringResource(R.string.trip_status_waiting_gps)
         now - fix.timeMillis > STALE_FIX_MS -> stringResource(R.string.trip_status_gps_lost)
+        progress.waitingToDepart -> stringResource(R.string.trip_status_waiting_to_depart)
         (fix.speedMps ?: 0f) < STOPPED_MPS && progress.atStation ->
             stringResource(R.string.trip_status_stopped_at, network.station(progress.stationIds[progress.lastStationIndex]).name)
         (fix.speedMps ?: 0f) < STOPPED_MPS -> stringResource(R.string.trip_status_stopped)
