@@ -5,6 +5,7 @@ import com.karthikmacherla.metrotracker.core.LocationFix
 import com.karthikmacherla.metrotracker.core.Route
 import com.karthikmacherla.metrotracker.core.TripProgress
 import com.karthikmacherla.metrotracker.core.TripTracker
+import com.karthikmacherla.metrotracker.core.estimateArrivalMillis
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +20,8 @@ data class ActiveTrip(
     /** Set the first time the rider reaches the destination. */
     val arrivedAtMillis: Long? = null,
 ) {
-    val estimatedArrivalMillis: Long get() = progressAtMillis + progress.remainingSeconds * 1000L
+    /** See [estimateArrivalMillis]: slides later while waiting to depart, counts down once riding. */
+    fun estimatedArrivalMillis(nowMillis: Long): Long = estimateArrivalMillis(progress, progressAtMillis, nowMillis)
 
     /** Speed of the latest fix in km/h, if the phone reported one. */
     val speedKmh: Int? get() = lastFix?.speedMps?.let { (it * 3.6f).toInt() }
