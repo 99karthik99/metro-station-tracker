@@ -141,7 +141,7 @@ private fun statusLine(trip: ActiveTrip, network: MetroNetwork, now: Long): Stri
     return when {
         fix == null -> stringResource(R.string.trip_status_waiting_gps)
         now - fix.timeMillis > STALE_FIX_MS -> stringResource(R.string.trip_status_gps_lost)
-        progress.waitingToDepart -> stringResource(R.string.trip_status_waiting_to_depart)
+        progress.waitingToDepart -> stringResource(R.string.trip_status_waiting_to_depart, network.station(progress.stationIds[0]).name)
         (fix.speedMps ?: 0f) < STOPPED_MPS && progress.atStation ->
             stringResource(R.string.trip_status_stopped_at, network.station(progress.stationIds[progress.lastStationIndex]).name)
         (fix.speedMps ?: 0f) < STOPPED_MPS -> stringResource(R.string.trip_status_stopped)

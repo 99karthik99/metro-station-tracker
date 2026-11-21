@@ -53,7 +53,7 @@
     <string name="trip_status_gps_lost">GPS signal lost · times are estimates</string>
     <string name="trip_status_stopped_at">Stopped at %s</string>
     <string name="trip_status_stopped">Stopped</string>
-    <string name="trip_status_waiting_to_depart">Not moving yet · arrival time updates until the train leaves</string>
+    <string name="trip_status_waiting_to_depart">Waiting at %s</string>
     <string name="trip_status_moving">Moving · %d km/h</string>
     <string name="trip_end">End trip</string>
     <string name="trip_notifications_off">Notifications are off, so you won\'t get stop alerts.</string>
